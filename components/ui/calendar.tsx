@@ -85,12 +85,12 @@ function Calendar({
           defaultClassNames.caption_label
         ),
         table: "w-full border-collapse",
-        weekdays: cn("flex", defaultClassNames.weekdays),
+        weekdays: cn("flex", defaultClassNames.weekdays, "gap-0"),
         weekday: cn(
           "text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal",
           defaultClassNames.weekday
         ),
-        week: cn("mt-2 flex w-full", defaultClassNames.week),
+        week: cn("mt-2 flex w-full", defaultClassNames.week, "gap-0"),
         week_number_header: cn(
           "w-[--cell-size] select-none",
           defaultClassNames.week_number_header
@@ -180,28 +180,58 @@ function CalendarDayButton({
     if (modifiers.focused) ref.current?.focus()
   }, [modifiers.focused])
 
+  const isRangeStart = !!modifiers.range_start
+  const isRangeEnd = !!modifiers.range_end
+  const isRangeMiddle = !!modifiers.range_middle
+  const isRange = isRangeStart || isRangeEnd || isRangeMiddle
+
   return (
-    <Button
-      ref={ref}
-      variant="ghost"
-      size="icon"
-      data-day={day.date.toLocaleDateString()}
-      data-selected-single={
-        modifiers.selected &&
-        !modifiers.range_start &&
-        !modifiers.range_end &&
-        !modifiers.range_middle
-      }
-      data-range-start={modifiers.range_start}
-      data-range-end={modifiers.range_end}
-      data-range-middle={modifiers.range_middle}
-      className={cn(
-        "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none data-[range-start=true]:rounded-l-md data-[range-start=true]:rounded-r-none data-[range-end=true]:rounded-r-md data-[range-end=true]:rounded-l-none data-[range-middle=true]:rounded-none group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70",
-        defaultClassNames.day,
-        className
+    <>
+      {/* Full-width band background — fills entire cell, no gaps */}
+      {isRange && (
+        <div
+          aria-hidden
+          className={cn(
+            "absolute inset-y-0 pointer-events-none",
+            isRangeMiddle && "inset-x-0 bg-accent",
+            isRangeStart && !isRangeEnd && "left-1/2 right-0 bg-accent",
+            isRangeEnd && !isRangeStart && "left-0 right-1/2 bg-accent",
+          )}
+        />
       )}
-      {...props}
-    />
+      <Button
+        ref={ref}
+        variant="ghost"
+        size="icon"
+        data-day={day.date.toLocaleDateString()}
+        data-selected-single={
+          modifiers.selected &&
+          !modifiers.range_start &&
+          !modifiers.range_end &&
+          !modifiers.range_middle
+        }
+        data-range-start={modifiers.range_start}
+        data-range-end={modifiers.range_end}
+        data-range-middle={modifiers.range_middle}
+        className={cn(
+          "relative z-10",
+          "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground",
+          "data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground",
+          "data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground",
+          "data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground",
+          "group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50",
+          "flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none",
+          "data-[range-start=true]:rounded-l-md data-[range-start=true]:rounded-r-none",
+          "data-[range-end=true]:rounded-r-md data-[range-end=true]:rounded-l-none",
+          "data-[range-middle=true]:rounded-none",
+          "group-data-[focused=true]/day:ring-[3px]",
+          "[&>span]:text-xs [&>span]:opacity-70",
+          defaultClassNames.day,
+          className
+        )}
+        {...props}
+      />
+    </>
   )
 }
 
