@@ -68,7 +68,7 @@ export function ColorView({ lang }: ColorViewProps) {
               key={m}
               onClick={() => setMode(m)}
               className={cn(
-                "px-3 py-1 rounded-full transition-all capitalize",
+                "px-3 py-1 rounded-full transition-all capitalize cursor-pointer",
                 mode === m
                   ? isDark
                     ? "bg-zinc-700 text-white"
@@ -124,7 +124,7 @@ export function ColorView({ lang }: ColorViewProps) {
                       onClick={() => handleCopy(ci.label)}
                       title={ci.label}
                       className={cn(
-                        "group relative h-9 w-24 rounded-lg transition-all duration-150",
+                        "group relative h-9 w-24 rounded-lg transition-all duration-150 cursor-pointer",
                         "hover:scale-[1.04] active:scale-[0.97]",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
                         isDark

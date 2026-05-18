@@ -44,7 +44,7 @@ export function LeftPanel({
           <button
             onClick={() => onViewChange("components")}
             className={[
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors",
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors cursor-pointer",
               view === "components"
                 ? "bg-zinc-700 text-white shadow-sm"
                 : "text-zinc-500 hover:text-zinc-300",
@@ -56,7 +56,7 @@ export function LeftPanel({
           <button
             onClick={() => onViewChange("colors")}
             className={[
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors",
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors cursor-pointer",
               view === "colors"
                 ? "bg-zinc-700 text-white shadow-sm"
                 : "text-zinc-500 hover:text-zinc-300",
@@ -87,7 +87,7 @@ export function LeftPanel({
                     <button
                       onClick={() => onSelect(comp.id)}
                       className={[
-                        "w-full text-left px-4 py-1.5 rounded-md text-sm transition-colors",
+                        "w-full text-left px-4 py-1.5 rounded-md text-sm transition-colors cursor-pointer",
                         selectedId === comp.id
                           ? "bg-blue-600 text-white font-medium"
                           : "text-zinc-400 hover:bg-[rgba(146,187,255,0.1)] hover:text-zinc-100",
@@ -141,7 +141,7 @@ export function LeftPanel({
               key={l}
               onClick={() => onLangChange(l)}
               className={[
-                "text-[11px] font-medium px-1.5 py-0.5 rounded transition-colors",
+                "text-[11px] font-medium px-1.5 py-0.5 rounded transition-colors cursor-pointer",
                 lang === l
                   ? "text-white bg-zinc-700"
                   : "text-zinc-500 hover:text-zinc-300",
