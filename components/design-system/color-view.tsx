@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Sun, Moon, Check, Copy } from "lucide-react"
+import { Check } from "lucide-react"
 import { colorGroups } from "./colors"
 import { translations, type Lang } from "./i18n"
 import { cn } from "@/lib/utils"
@@ -22,141 +22,172 @@ export function ColorView({ lang }: ColorViewProps) {
     setTimeout(() => setCopied(null), 1500)
   }
 
+  const pageBg = isDark ? "bg-zinc-950" : "bg-white"
+  const divider  = isDark ? "border-zinc-800" : "border-zinc-100"
+  const groupLabel = isDark ? "text-zinc-600" : "text-zinc-300"
+  const swatchName = isDark ? "text-zinc-300" : "text-zinc-600"
+  const swatchHex  = isDark ? "text-zinc-600" : "text-zinc-400"
+
   return (
-    <main className="flex-1 min-w-0 flex flex-col border-x border-zinc-200 bg-white overflow-hidden">
+    <main
+      className={cn(
+        "flex-1 min-w-0 flex flex-col border-x border-zinc-200 overflow-hidden transition-colors duration-300",
+        pageBg
+      )}
+    >
       {/* Header */}
-      <div className="p-4 shrink-0 h-[74px] flex flex-col justify-center border-b border-zinc-200">
-        <h1 className="text-base font-semibold text-zinc-800 leading-none">
-          {t.colors}
-        </h1>
-        <p className="text-[13px] text-zinc-400 mt-0.5">{t.colorsDescription}</p>
+      <div
+        className={cn(
+          "px-8 shrink-0 h-[74px] flex items-center justify-between border-b",
+          divider
+        )}
+      >
+        <div>
+          <h1
+            className={cn(
+              "text-base font-semibold leading-none",
+              isDark ? "text-white" : "text-zinc-800"
+            )}
+          >
+            {t.colors}
+          </h1>
+          <p className={cn("text-[12px] mt-0.5", swatchHex)}>
+            {t.colorsDescription}
+          </p>
+        </div>
+
+        {/* Toggle */}
+        <div
+          className={cn(
+            "flex rounded-full p-0.5 text-[11px] font-medium",
+            isDark ? "bg-zinc-800" : "bg-zinc-100"
+          )}
+        >
+          {(["light", "dark"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={cn(
+                "px-3 py-1 rounded-full transition-all capitalize",
+                mode === m
+                  ? isDark
+                    ? "bg-zinc-700 text-white"
+                    : "bg-white text-zinc-800 shadow-sm"
+                  : isDark
+                  ? "text-zinc-500 hover:text-zinc-300"
+                  : "text-zinc-400 hover:text-zinc-600"
+              )}
+            >
+              {m === "light" ? t.lightMode : t.darkMode}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto p-4">
-
-        {/* Light / Dark toggle */}
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-semibold text-zinc-700">
-            {isDark ? t.darkMode : t.lightMode}
-          </h2>
-          <div className="flex items-center gap-0.5 rounded-lg p-0.5 bg-zinc-100">
-            <button
-              onClick={() => setMode("light")}
-              title={t.lightMode}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all",
-                !isDark
-                  ? "bg-white text-amber-500 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-700",
-              )}
-            >
-              <Sun className="size-3.5" />
-              {t.lightMode}
-            </button>
-            <button
-              onClick={() => setMode("dark")}
-              title={t.darkMode}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all",
-                isDark
-                  ? "bg-zinc-800 text-indigo-400 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-700",
-              )}
-            >
-              <Moon className="size-3.5" />
-              {t.darkMode}
-            </button>
-          </div>
-        </div>
-
-        {/* Color groups grid */}
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
-          {colorGroups.map((group) => (
-            <div
-              key={group.id}
-              className={cn(
-                "rounded-2xl p-4 border transition-colors duration-200",
-                group.wide && "col-span-2 xl:col-span-2",
-                isDark
-                  ? "bg-zinc-900 border-zinc-800"
-                  : "bg-white border-zinc-100 shadow-sm",
-              )}
-            >
-              {/* Group name */}
-              <p
+      <div className="flex-1 overflow-y-auto">
+        {colorGroups.map((group, gi) => (
+          <div
+            key={group.id}
+            className={cn(
+              "px-8 py-6 flex gap-8",
+              gi !== 0 && `border-t ${divider}`
+            )}
+          >
+            {/* Group label — fixed left column */}
+            <div className="w-32 shrink-0 pt-1">
+              <span
                 className={cn(
-                  "text-[11px] font-semibold uppercase tracking-wider mb-3",
-                  isDark ? "text-zinc-400" : "text-zinc-500",
+                  "text-[10px] font-semibold uppercase tracking-widest",
+                  groupLabel
                 )}
               >
                 {group.name}
-              </p>
+              </span>
+            </div>
 
-              {/* Swatches */}
-              <div className="flex flex-wrap gap-4">
-                {group.swatches.map((swatch) => {
-                  const ci = isDark ? swatch.dark : swatch.light
-                  const isCopied = copied === ci.label
-                  return (
-                    <div key={swatch.name} className="flex flex-col gap-1.5">
-                      {/* Color square */}
-                      <button
-                        onClick={() => handleCopy(ci.label)}
-                        title={`Copiar ${ci.label}`}
+            {/* Swatches */}
+            <div className="flex flex-wrap gap-x-3 gap-y-5">
+              {group.swatches.map((swatch) => {
+                const ci = isDark ? swatch.dark : swatch.light
+                const isCopied = copied === ci.label
+                const isTransparent =
+                  ci.color.startsWith("rgba") ||
+                  ci.color.endsWith("1A") ||
+                  ci.color.endsWith("0A") ||
+                  ci.color.endsWith("1F")
+
+                return (
+                  <div key={swatch.name} className="flex flex-col gap-2">
+                    {/* Chip */}
+                    <button
+                      onClick={() => handleCopy(ci.label)}
+                      title={ci.label}
+                      className={cn(
+                        "group relative h-9 w-24 rounded-lg transition-all duration-150",
+                        "hover:scale-[1.04] active:scale-[0.97]",
+                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+                        isDark
+                          ? "ring-offset-zinc-950 focus-visible:ring-zinc-500"
+                          : "ring-offset-white focus-visible:ring-zinc-300"
+                      )}
+                      style={{
+                        backgroundColor: ci.color,
+                        ...(isTransparent
+                          ? {
+                              backgroundImage:
+                                "linear-gradient(45deg,#d4d4d4 25%,transparent 25%),linear-gradient(-45deg,#d4d4d4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d4d4d4 75%),linear-gradient(-45deg,transparent 75%,#d4d4d4 75%)",
+                              backgroundSize: "6px 6px",
+                              backgroundPosition:
+                                "0 0,0 3px,3px -3px,-3px 0px",
+                            }
+                          : {}),
+                      }}
+                    >
+                      {/* Copy overlay */}
+                      <span
                         className={cn(
-                          "group relative w-[76px] h-[76px] rounded-2xl border transition-transform duration-150 hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-zinc-400",
-                          isDark ? "border-white/5" : "border-black/5",
+                          "absolute inset-0 rounded-lg flex items-center justify-center transition-all duration-150",
+                          "bg-black/20 backdrop-blur-[1px]",
+                          isCopied
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100"
                         )}
-                        style={{
-                          backgroundColor: ci.color,
-                          backgroundImage:
-                            ci.color.includes("rgba") || ci.color.includes("1A") || ci.color.includes("0A")
-                              ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='4' height='4' fill='%23ccc'/%3E%3Crect x='4' y='4' width='4' height='4' fill='%23ccc'/%3E%3C/svg%3E\")"
-                              : undefined,
-                          backgroundSize: ci.color.includes("rgba") ? "8px 8px" : undefined,
-                        }}
                       >
-                        {/* Overlay on copy */}
-                        <span
+                        <Check
                           className={cn(
-                            "absolute inset-0 rounded-2xl flex items-center justify-center transition-opacity duration-150",
-                            "bg-black/25",
-                            isCopied ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                            "transition-all duration-150",
+                            isCopied ? "size-3.5 text-white" : "size-3 text-white/80"
                           )}
-                        >
-                          {isCopied ? (
-                            <Check className="size-4 text-white drop-shadow" />
-                          ) : (
-                            <Copy className="size-3.5 text-white drop-shadow" />
-                          )}
-                        </span>
-                      </button>
+                        />
+                      </span>
+                    </button>
 
-                      {/* Label */}
+                    {/* Name + hex */}
+                    <div className="w-24">
                       <p
                         className={cn(
-                          "text-[11px] font-medium leading-tight max-w-[76px]",
-                          isDark ? "text-zinc-200" : "text-zinc-700",
+                          "text-[11px] font-medium leading-tight truncate",
+                          swatchName
                         )}
                       >
                         {swatch.name}
                       </p>
                       <p
                         className={cn(
-                          "text-[10px] font-mono leading-none",
-                          isDark ? "text-zinc-500" : "text-zinc-400",
+                          "text-[10px] font-mono mt-0.5 truncate",
+                          swatchHex
                         )}
                       >
                         {ci.label}
                       </p>
                     </div>
-                  )
-                })}
-              </div>
+                  </div>
+                )
+              })}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </main>
   )
