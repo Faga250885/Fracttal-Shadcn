@@ -1,16 +1,28 @@
 "use client"
 
+import { Palette, Layers } from "lucide-react"
 import { categorizedComponents } from "./registry"
 import { translations, type Lang } from "./i18n"
 
+export type ViewMode = "components" | "colors"
+
 interface LeftPanelProps {
+  view: ViewMode
+  onViewChange: (v: ViewMode) => void
   selectedId: string
   onSelect: (id: string) => void
   lang: Lang
   onLangChange: (lang: Lang) => void
 }
 
-export function LeftPanel({ selectedId, onSelect, lang, onLangChange }: LeftPanelProps) {
+export function LeftPanel({
+  view,
+  onViewChange,
+  selectedId,
+  onSelect,
+  lang,
+  onLangChange,
+}: LeftPanelProps) {
   const t = translations[lang]
 
   return (
@@ -26,37 +38,99 @@ export function LeftPanel({ selectedId, onSelect, lang, onLangChange }: LeftPane
         </div>
       </div>
 
-      {/* Component tree */}
+      {/* View toggle — Components / Colors */}
+      <div className="px-4 pt-4 pb-3 border-b border-zinc-800">
+        <div className="flex gap-1 rounded-lg bg-zinc-900 p-0.5">
+          <button
+            onClick={() => onViewChange("components")}
+            className={[
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors",
+              view === "components"
+                ? "bg-zinc-700 text-white shadow-sm"
+                : "text-zinc-500 hover:text-zinc-300",
+            ].join(" ")}
+          >
+            <Layers className="size-3.5" />
+            {t.components}
+          </button>
+          <button
+            onClick={() => onViewChange("colors")}
+            className={[
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors",
+              view === "colors"
+                ? "bg-zinc-700 text-white shadow-sm"
+                : "text-zinc-500 hover:text-zinc-300",
+            ].join(" ")}
+          >
+            <Palette className="size-3.5" />
+            {t.colors}
+          </button>
+        </div>
+      </div>
+
+      {/* Navigation content */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-4">
-        {Object.entries(categorizedComponents).map(([category, comps]) => (
-          <div key={category}>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                {t.components}
-              </p>
-              <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded-full">
-                {comps.length}
-              </span>
+        {view === "components" ? (
+          Object.entries(categorizedComponents).map(([category, comps]) => (
+            <div key={category}>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                  {t.components}
+                </p>
+                <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded-full">
+                  {comps.length}
+                </span>
+              </div>
+              <ul className="space-y-0.5">
+                {comps.map((comp) => (
+                  <li key={comp.id}>
+                    <button
+                      onClick={() => onSelect(comp.id)}
+                      className={[
+                        "w-full text-left px-4 py-1.5 rounded-md text-sm transition-colors",
+                        selectedId === comp.id
+                          ? "bg-blue-600 text-white font-medium"
+                          : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                      ].join(" ")}
+                    >
+                      {comp.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
+          ))
+        ) : (
+          /* Colors section — groups listed as reference */
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 mb-4">
+              {t.colors}
+            </p>
             <ul className="space-y-0.5">
-              {comps.map((comp) => (
-                <li key={comp.id}>
-                  <button
-                    onClick={() => onSelect(comp.id)}
-                    className={[
-                      "w-full text-left px-4 py-1.5 rounded-md text-sm transition-colors",
-                      selectedId === comp.id
-                        ? "bg-blue-600 text-white font-medium"
-                        : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
-                    ].join(" ")}
-                  >
-                    {comp.name}
-                  </button>
+              {[
+                "Fracttal AI",
+                "Primary",
+                "Secondary",
+                "Text",
+                "Action",
+                "Other",
+                "Error status",
+                "Warning status",
+                "Info status",
+                "Success status",
+                "Content",
+                "Background",
+              ].map((group) => (
+                <li key={group}>
+                  <div className="w-full text-left px-4 py-1.5 rounded-md text-sm text-zinc-500 flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-zinc-700 shrink-0" />
+                    {group}
+                  </div>
                 </li>
               ))}
             </ul>
           </div>
-        ))}
+        )}
       </nav>
 
       {/* Footer */}

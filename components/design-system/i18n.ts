@@ -3,6 +3,8 @@ export type Lang = "en" | "es"
 export const translations = {
   en: {
     components: "Components",
+    colors: "Colors",
+    colorsDescription: "Fracttal brand color tokens — light & dark.",
     controls: "Controls",
     configureHere: "Configure the component here.",
     selectToSeeControls: "Select a component to see its controls.",
@@ -12,11 +14,13 @@ export const translations = {
     selectFromLeft: "Select a component from the left panel",
     copy: "Copy",
     copied: "Copied",
-    lightMode: "Light mode",
-    darkMode: "Dark mode",
+    lightMode: "Light",
+    darkMode: "Dark",
   },
   es: {
     components: "Componentes",
+    colors: "Colores",
+    colorsDescription: "Tokens de color de la marca Fracttal — claro y oscuro.",
     controls: "Controles",
     configureHere: "Configura el componente aquí.",
     selectToSeeControls: "Selecciona un componente para ver sus controles.",
@@ -26,7 +30,7 @@ export const translations = {
     selectFromLeft: "Selecciona un componente del panel izquierdo",
     copy: "Copiar",
     copied: "Copiado",
-    lightMode: "Modo claro",
-    darkMode: "Modo oscuro",
+    lightMode: "Claro",
+    darkMode: "Oscuro",
   },
 } satisfies Record<Lang, Record<string, string>>
