@@ -20,11 +20,11 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
   return (
     <main className="flex-1 min-w-0 flex flex-col border-x border-zinc-200 bg-white overflow-hidden">
       {/* Component header */}
-      <div className="p-4 shrink-0 h-[66px] flex flex-col justify-center border-b border-zinc-200">
-        <h1 className="text-sm font-semibold text-zinc-800 leading-none">
+      <div className="p-4 shrink-0 h-[74px] flex flex-col justify-center border-b border-zinc-200">
+        <h1 className="text-base font-semibold text-zinc-800 leading-none">
           {component?.name ?? "—"}
         </h1>
-        <p className="text-[11px] text-zinc-400 mt-0.5">
+        <p className="text-[13px] text-zinc-400 mt-0.5">
           {component?.description}
         </p>
       </div>

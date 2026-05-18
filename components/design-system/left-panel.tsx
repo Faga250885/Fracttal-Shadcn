@@ -9,14 +9,14 @@ interface LeftPanelProps {
 
 export function LeftPanel({ selectedId, onSelect }: LeftPanelProps) {
   return (
-    <aside className="w-64 shrink-0 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
+    <aside className="w-[307px] shrink-0 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
       {/* Brand header */}
       <div className="p-4 border-b border-zinc-800">
         <div className="flex items-center gap-2">
           <img src="/isotipo.svg" alt="Fracttal" className="size-8" />
           <div className="leading-none">
-            <p className="text-sm font-semibold text-white">Helix</p>
-            <p className="text-[11px] text-zinc-500 mt-0.5">Fracttal Design System</p>
+            <p className="text-base font-semibold text-white">Helix</p>
+            <p className="text-[13px] text-zinc-500 mt-0.5">Fracttal Design System</p>
           </div>
         </div>
       </div>

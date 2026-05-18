@@ -14,10 +14,10 @@ interface RightPanelProps {
 
 export function RightPanel({ component, propValues, onChange }: RightPanelProps) {
   return (
-    <aside className="w-64 shrink-0 flex flex-col bg-white border-l border-zinc-200">
-      <div className="p-4 border-b border-zinc-200 h-[66px] flex flex-col justify-center">
-        <h2 className="text-sm font-semibold text-zinc-800">Controls</h2>
-        <p className="text-[11px] text-zinc-400 mt-0.5">Configura el componente aquí.</p>
+    <aside className="w-[307px] shrink-0 flex flex-col bg-white border-l border-zinc-200">
+      <div className="p-4 border-b border-zinc-200 h-[74px] flex flex-col justify-center">
+        <h2 className="text-base font-semibold text-zinc-800">Controls</h2>
+        <p className="text-[13px] text-zinc-400 mt-0.5">Configura el componente aquí.</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
