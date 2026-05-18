@@ -13,8 +13,8 @@ export function LeftPanel({ selectedId, onSelect }: LeftPanelProps) {
       {/* Brand header */}
       <div className="p-4 border-b border-zinc-800">
         <div className="flex items-center gap-4">
-          <div className="size-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm font-black tracking-tight">
-            F
+          <div className="size-8 rounded-lg bg-blue-600 flex items-center justify-center p-1">
+            <img src="/isotipo.svg" alt="Fracttal" className="size-full" />
           </div>
           <div className="leading-none">
             <p className="text-sm font-semibold text-white">Fracttal</p>
