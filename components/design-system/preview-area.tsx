@@ -1,0 +1,142 @@
+"use client"
+
+import { useState } from "react"
+import { Sun, Moon } from "lucide-react"
+import type { ComponentEntry } from "./types"
+import { CodeBlock } from "./code-block"
+
+interface PreviewAreaProps {
+  component: ComponentEntry | undefined
+  propValues: Record<string, unknown>
+}
+
+type Mode = "light" | "dark"
+
+export function PreviewArea({ component, propValues }: PreviewAreaProps) {
+  const [mode, setMode] = useState<Mode>("light")
+
+  const isDark = mode === "dark"
+
+  return (
+    <main className="flex-1 min-w-0 flex flex-col border-x border-zinc-200 bg-white overflow-hidden">
+      {/* Component header */}
+      <div className="p-4 shrink-0 h-[66px] flex flex-col justify-center border-b border-zinc-200">
+        <h1 className="text-sm font-semibold text-zinc-800 leading-none">
+          {component?.name ?? "—"}
+        </h1>
+        <p className="text-[11px] text-zinc-400 mt-0.5">
+          {component?.description}
+        </p>
+      </div>
+
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto">
+
+        {/* Preview section */}
+        <div className="px-4 pt-4">
+          {/* Title row — above the canvas */}
+          <div className="flex items-center gap-4 mb-4">
+            <h2 className="text-sm font-semibold text-zinc-800">Vista previa</h2>
+            {component && (
+              <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
+                {component.filePath}
+              </span>
+            )}
+          </div>
+
+          {/* Canvas */}
+          <div
+            className={[
+              "relative min-h-[260px] flex items-center justify-center p-4 rounded-xl overflow-hidden transition-colors duration-200",
+              isDark ? "bg-zinc-900 dark text-foreground border border-transparent" : "bg-white text-foreground border border-zinc-100",
+            ].join(" ")}
+          >
+            {/* Light / Dark toggle */}
+            <div
+              className={[
+                "absolute top-4 right-4 flex items-center gap-0.5 rounded-lg p-0.5",
+                isDark ? "bg-zinc-800" : "bg-white/80",
+              ].join(" ")}
+            >
+              <button
+                onClick={() => setMode("light")}
+                aria-label="Modo claro"
+                title="Modo claro"
+                className={[
+                  "p-1.5 rounded-md transition-all",
+                  !isDark
+                    ? "bg-white text-amber-500 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-300",
+                ].join(" ")}
+              >
+                <Sun className="size-3.5" />
+              </button>
+              <button
+                onClick={() => setMode("dark")}
+                aria-label="Modo oscuro"
+                title="Modo oscuro"
+                className={[
+                  "p-1.5 rounded-md transition-all",
+                  isDark
+                    ? "bg-zinc-700 text-indigo-400 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-600",
+                ].join(" ")}
+              >
+                <Moon className="size-3.5" />
+              </button>
+            </div>
+
+            {component ? (
+              component.render(propValues)
+            ) : (
+              <p className="text-sm text-zinc-400">
+                Selecciona un componente del panel izquierdo
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Code section */}
+        {component && (
+          <div className="p-4 bg-white">
+            <div className="flex items-center gap-4 mb-4">
+              <h2 className="text-sm font-semibold text-zinc-800">
+                Implementación
+              </h2>
+              <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
+                Copia y pega en tu proyecto
+              </span>
+            </div>
+            <CodeBlock code={component.generateCode(propValues)} />
+          </div>
+        )}
+
+        {/* Examples section */}
+        {component?.examples && component.examples.length > 0 && (
+          <div className="p-4 bg-white">
+            <div className="flex items-center gap-4 mb-4">
+              <h2 className="text-sm font-semibold text-zinc-800">Ejemplos</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {component.examples.map((ex) => (
+                <div key={ex.title} className="flex flex-col gap-3">
+                  <p className="text-xs font-medium text-zinc-500">{ex.title}</p>
+                  <div
+                    className={[
+                      "rounded-xl p-4 flex items-center justify-center min-h-[80px] transition-colors duration-200",
+                      isDark
+                        ? "bg-zinc-900 dark text-foreground"
+                        : "bg-zinc-100 text-foreground",
+                    ].join(" ")}
+                  >
+                    {ex.render()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
+  )
+}
