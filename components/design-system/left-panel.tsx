@@ -30,9 +30,14 @@ export function LeftPanel({ selectedId, onSelect, lang, onLangChange }: LeftPane
       <nav className="flex-1 overflow-y-auto p-4 space-y-4">
         {Object.entries(categorizedComponents).map(([category, comps]) => (
           <div key={category}>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 mb-4">
-              {t.components}
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                {t.components}
+              </p>
+              <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded-full">
+                {comps.length}
+              </span>
+            </div>
             <ul className="space-y-0.5">
               {comps.map((comp) => (
                 <li key={comp.id}>

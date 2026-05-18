@@ -1,6 +1,6 @@
 "use client"
 
-import { Loader2, Search, User, Lock, Bell } from "lucide-react"
+import { Loader2, Search, Mail, User, Lock, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -24,14 +24,7 @@ export const components: ComponentEntry[] = [
       children: { type: "text", defaultValue: "Button" },
       variant: {
         type: "select",
-        options: [
-          "default",
-          "destructive",
-          "outline",
-          "secondary",
-          "ghost",
-          "link",
-        ],
+        options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
         defaultValue: "default",
       },
       size: {
@@ -39,67 +32,89 @@ export const components: ComponentEntry[] = [
         options: ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
         defaultValue: "default",
       },
+      icon: {
+        type: "select",
+        options: ["none", "start", "end"],
+        defaultValue: "none",
+      },
+      loading: { type: "boolean", defaultValue: false },
       disabled: { type: "boolean", defaultValue: false },
     },
     render: (props) => {
-      const { size, children, variant, disabled } = props as {
-        size: string
-        children: string
-        disabled: boolean
-        variant: string
+      const { size, children, variant, disabled, loading, icon } = props as {
+        size: string; children: string; variant: string
+        disabled: boolean; loading: boolean; icon: string
       }
-      const isIcon =
-        typeof size === "string" && size.startsWith("icon")
+      const isIconSize = size.startsWith("icon")
+
+      let content: React.ReactNode
+      if (loading) {
+        content = <><Loader2 className="animate-spin" />{!isIconSize && (children || "Button")}</>
+      } else if (isIconSize) {
+        content = <Mail />
+      } else if (icon === "start") {
+        content = <><Mail />{children || "Button"}</>
+      } else if (icon === "end") {
+        content = <>{children || "Button"}<Mail /></>
+      } else {
+        content = <>{children || "Button"}</>
+      }
+
       return (
-        <Button size={size as never} variant={variant as never} disabled={disabled}>
-          {isIcon ? <Loader2 /> : (children || "Button")}
+        <Button size={size as never} variant={variant as never} disabled={disabled || loading}>
+          {content}
         </Button>
       )
     },
     generateCode: (props) => {
-      const { children, size, variant, disabled } = props as {
-        children: string
-        size: string
-        variant: string
-        disabled: boolean
+      const { children, size, variant, disabled, loading, icon } = props as {
+        children: string; size: string; variant: string
+        disabled: boolean; loading: boolean; icon: string
       }
-      const isIcon = size.startsWith("icon")
+      const isIconSize = size.startsWith("icon")
+      const needsMailIcon = isIconSize || icon === "start" || icon === "end"
+      const needsLoader = loading
+
+      let innerContent: string
+      if (loading) {
+        innerContent = isIconSize
+          ? `\n  <Loader2 className="animate-spin" />\n`
+          : `\n  <Loader2 className="animate-spin" />\n  ${children || "Button"}\n`
+      } else if (isIconSize) {
+        innerContent = `\n  <Mail />\n`
+      } else if (icon === "start") {
+        innerContent = `\n  <Mail />\n  ${children || "Button"}\n`
+      } else if (icon === "end") {
+        innerContent = `\n  ${children || "Button"}\n  <Mail />\n`
+      } else {
+        innerContent = children || "Button"
+      }
 
       const attrs: string[] = []
       if (variant !== "default") attrs.push(`variant="${variant}"`)
       if (size !== "default") attrs.push(`size="${size}"`)
-      if (disabled) attrs.push("disabled")
+      if (disabled || loading) attrs.push("disabled")
 
-      // Inline if 0-1 attrs, multiline if 2+
-      let buttonJsx: string
-      if (attrs.length <= 1) {
-        const attrStr = attrs.length ? " " + attrs[0] : ""
-        const content = isIcon ? "<Loader2 />" : (children || "Button")
-        buttonJsx = `<Button${attrStr}>${content}</Button>`
-      } else {
-        const lines = [
-          "<Button",
-          ...attrs.map((a) => `  ${a}`),
-          ">",
-          `  ${isIcon ? "<Loader2 />" : (children || "Button")}`,
-          "</Button>",
-        ]
-        buttonJsx = lines.join("\n")
-      }
+      const attrStr = attrs.length
+        ? attrs.length === 1
+          ? ` ${attrs[0]}`
+          : `\n  ${attrs.join("\n  ")}\n`
+        : ""
 
-      const indented = buttonJsx
-        .split("\n")
-        .map((l) => `    ${l}`)
-        .join("\n")
+      const multilineAttrs = attrs.length >= 2
+      const buttonJsx = multilineAttrs
+        ? `<Button${attrStr}>${innerContent.startsWith("\n") ? innerContent : `\n  ${innerContent}\n`}</Button>`
+        : `<Button${attrStr}>${innerContent}</Button>`
 
-      const imports = [
-        isIcon ? 'import { Loader2 } from "lucide-react"' : null,
-        'import { Button } from "@/components/ui/button"',
-      ]
-        .filter(Boolean)
-        .join("\n")
+      const indented = buttonJsx.split("\n").map((l) => `    ${l}`).join("\n")
 
-      return `${imports}
+      const lucideImports: string[] = []
+      if (needsLoader) lucideImports.push("Loader2")
+      if (needsMailIcon && !loading) lucideImports.push("Mail")
+      const lucideLine = lucideImports.length
+        ? `import { ${lucideImports.join(", ")} } from "lucide-react"\n` : ""
+
+      return `${lucideLine}import { Button } from "@/components/ui/button"
 
 export default function Example() {
   return (
