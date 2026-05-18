@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { components } from "./registry"
 import type { ComponentEntry } from "./types"
+import type { Lang } from "./i18n"
 import { LeftPanel } from "./left-panel"
 import { PreviewArea } from "./preview-area"
 import { RightPanel } from "./right-panel"
@@ -22,6 +23,7 @@ export function DSViewer() {
   const [propValues, setPropValues] = useState<Record<string, unknown>>(
     initial ? defaultValues(initial) : {}
   )
+  const [lang, setLang] = useState<Lang>("en")
 
   const selected = components.find((c) => c.id === selectedId)
 
@@ -41,13 +43,9 @@ export function DSViewer() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-white">
-      <LeftPanel selectedId={selectedId} onSelect={handleSelect} />
-      <PreviewArea component={selected} propValues={propValues} />
-      <RightPanel
-        component={selected}
-        propValues={propValues}
-        onChange={handleChange}
-      />
+      <LeftPanel selectedId={selectedId} onSelect={handleSelect} lang={lang} onLangChange={setLang} />
+      <PreviewArea component={selected} propValues={propValues} lang={lang} />
+      <RightPanel component={selected} propValues={propValues} onChange={handleChange} lang={lang} />
     </div>
   )
 }

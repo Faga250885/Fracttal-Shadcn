@@ -5,15 +5,18 @@ import { Check, Copy } from "lucide-react"
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter"
 import tsx from "react-syntax-highlighter/dist/esm/languages/prism/tsx"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { translations, type Lang } from "./i18n"
 
 SyntaxHighlighter.registerLanguage("tsx", tsx)
 
 interface CodeBlockProps {
   code: string
+  lang: Lang
 }
 
-export function CodeBlock({ code }: CodeBlockProps) {
+export function CodeBlock({ code, lang }: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
+  const t = translations[lang]
 
   async function handleCopy() {
     await navigator.clipboard.writeText(code)
@@ -39,7 +42,7 @@ export function CodeBlock({ code }: CodeBlockProps) {
           ) : (
             <Copy className="size-3.5" />
           )}
-          <span>{copied ? "Copiado" : "Copiar"}</span>
+          <span>{copied ? t.copied : t.copy}</span>
         </button>
       </div>
 

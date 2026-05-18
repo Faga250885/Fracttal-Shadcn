@@ -4,17 +4,19 @@ import { useState } from "react"
 import { Sun, Moon } from "lucide-react"
 import type { ComponentEntry } from "./types"
 import { CodeBlock } from "./code-block"
+import { translations, type Lang } from "./i18n"
 
 interface PreviewAreaProps {
   component: ComponentEntry | undefined
   propValues: Record<string, unknown>
+  lang: Lang
 }
 
 type Mode = "light" | "dark"
 
-export function PreviewArea({ component, propValues }: PreviewAreaProps) {
+export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
   const [mode, setMode] = useState<Mode>("light")
-
+  const t = translations[lang]
   const isDark = mode === "dark"
 
   return (
@@ -25,7 +27,7 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
           {component?.name ?? "—"}
         </h1>
         <p className="text-[13px] text-zinc-400 mt-0.5">
-          {component?.description}
+          {component?.description[lang]}
         </p>
       </div>
 
@@ -36,7 +38,7 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
         <div className="px-4 pt-4">
           {/* Title row — above the canvas */}
           <div className="flex items-center gap-4 mb-4">
-            <h2 className="text-sm font-semibold text-zinc-800">Preview</h2>
+            <h2 className="text-sm font-semibold text-zinc-800">{t.preview}</h2>
             {component && (
               <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
                 {component.filePath}
@@ -60,8 +62,8 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
             >
               <button
                 onClick={() => setMode("light")}
-                aria-label="Light mode"
-                title="Light mode"
+                aria-label={t.lightMode}
+                title={t.lightMode}
                 className={[
                   "p-1.5 rounded-md transition-all",
                   !isDark
@@ -73,8 +75,8 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
               </button>
               <button
                 onClick={() => setMode("dark")}
-                aria-label="Dark mode"
-                title="Dark mode"
+                aria-label={t.darkMode}
+                title={t.darkMode}
                 className={[
                   "p-1.5 rounded-md transition-all",
                   isDark
@@ -90,7 +92,7 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
               component.render(propValues)
             ) : (
               <p className="text-sm text-zinc-400">
-                Select a component from the left panel
+                {t.selectFromLeft}
               </p>
             )}
           </div>
@@ -101,13 +103,13 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
           <div className="p-4 bg-white">
             <div className="flex items-center gap-4 mb-4">
               <h2 className="text-sm font-semibold text-zinc-800">
-                Implementation
+                {t.implementation}
               </h2>
               <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
-                Copy and paste in your project
+                {t.copyPaste}
               </span>
             </div>
-            <CodeBlock code={component.generateCode(propValues)} />
+            <CodeBlock code={component.generateCode(propValues)} lang={lang} />
           </div>
         )}
 

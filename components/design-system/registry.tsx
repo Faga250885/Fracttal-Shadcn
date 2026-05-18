@@ -14,8 +14,10 @@ export const components: ComponentEntry[] = [
   {
     id: "button",
     name: "Button",
-    description:
-      "Displays a button or a component that looks like a button.",
+    description: {
+      en: "Displays a button or a component that looks like a button.",
+      es: "Muestra un botón o un componente que se parece a un botón.",
+    },
     category: "Components",
     filePath: "components/ui/button.tsx",
     controls: {
@@ -109,7 +111,10 @@ ${indented}
   {
     id: "input",
     name: "Input",
-    description: "Displays a form input field for text-based data entry.",
+    description: {
+      en: "Displays a form input field for text-based data entry.",
+      es: "Muestra un campo de formulario para la entrada de texto.",
+    },
     category: "Components",
     filePath: "components/ui/input.tsx",
     controls: {
@@ -276,7 +281,10 @@ ${indented}
   {
     id: "tabs",
     name: "Tabs",
-    description: "A set of layered sections of content — known as tab panels — that are displayed one at a time.",
+    description: {
+      en: "A set of layered sections of content — known as tab panels — that are displayed one at a time.",
+      es: "Un conjunto de secciones de contenido apiladas, conocidas como paneles de pestañas, que se muestran de una en una.",
+    },
     category: "Components",
     filePath: "components/ui/tabs.tsx",
     controls: {
@@ -407,7 +415,10 @@ ${indented}
   {
     id: "select",
     name: "Select",
-    description: "Displays a list of options for the user to pick from — triggered by a button.",
+    description: {
+      en: "Displays a list of options for the user to pick from — triggered by a button.",
+      es: "Muestra una lista de opciones para que el usuario elija — activada por un botón.",
+    },
     category: "Components",
     filePath: "components/ui/select.tsx",
     controls: {

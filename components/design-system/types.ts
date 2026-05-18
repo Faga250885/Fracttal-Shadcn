@@ -38,7 +38,7 @@ export type ControlDefinition =
 export type ComponentEntry = {
   id: string
   name: string
-  description: string
+  description: { en: string; es: string }
   category: string
   filePath: string
   controls: Record<string, ControlDefinition>
