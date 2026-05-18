@@ -5,6 +5,7 @@ import { Sun, Moon } from "lucide-react"
 import type { ComponentEntry } from "./types"
 import { CodeBlock } from "./code-block"
 import { translations, type Lang } from "./i18n"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface PreviewAreaProps {
   component: ComponentEntry | undefined
@@ -54,38 +55,19 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
             ].join(" ")}
           >
             {/* Light / Dark toggle */}
-            <div
-              className={[
-                "absolute top-4 right-4 flex items-center gap-0.5 rounded-lg p-0.5",
-                isDark ? "bg-zinc-800" : "bg-white/80",
-              ].join(" ")}
-            >
-              <button
-                onClick={() => setMode("light")}
-                aria-label={t.lightMode}
-                title={t.lightMode}
-                className={[
-                  "p-1.5 rounded-md transition-all",
-                  !isDark
-                    ? "bg-white text-amber-500 shadow-sm"
-                    : "text-zinc-500 hover:text-zinc-300",
-                ].join(" ")}
-              >
-                <Sun className="size-3.5" />
-              </button>
-              <button
-                onClick={() => setMode("dark")}
-                aria-label={t.darkMode}
-                title={t.darkMode}
-                className={[
-                  "p-1.5 rounded-md transition-all",
-                  isDark
-                    ? "bg-zinc-700 text-indigo-400 shadow-sm"
-                    : "text-zinc-400 hover:text-zinc-600",
-                ].join(" ")}
-              >
-                <Moon className="size-3.5" />
-              </button>
+            <div className="absolute top-3 right-3">
+              <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
+                <TabsList className="h-7 p-0.5">
+                  <TabsTrigger value="light" className="h-6 px-2 gap-1 text-[11px]">
+                    <Sun className="size-3" />
+                    {t.lightMode}
+                  </TabsTrigger>
+                  <TabsTrigger value="dark" className="h-6 px-2 gap-1 text-[11px]">
+                    <Moon className="size-3" />
+                    {t.darkMode}
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
             {component ? (

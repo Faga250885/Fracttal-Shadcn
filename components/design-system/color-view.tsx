@@ -5,6 +5,7 @@ import { Check } from "lucide-react"
 import { colorGroups } from "./colors"
 import { translations, type Lang } from "./i18n"
 import { cn } from "@/lib/utils"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface ColorViewProps {
   lang: Lang
@@ -57,31 +58,12 @@ export function ColorView({ lang }: ColorViewProps) {
         </div>
 
         {/* Toggle */}
-        <div
-          className={cn(
-            "flex rounded-full p-0.5 text-[11px] font-medium",
-            isDark ? "bg-zinc-800" : "bg-zinc-100"
-          )}
-        >
-          {(["light", "dark"] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={cn(
-                "px-3 py-1 rounded-full transition-all capitalize cursor-pointer",
-                mode === m
-                  ? isDark
-                    ? "bg-zinc-700 text-white"
-                    : "bg-white text-zinc-800 shadow-sm"
-                  : isDark
-                  ? "text-zinc-500 hover:text-zinc-300"
-                  : "text-zinc-400 hover:text-zinc-600"
-              )}
-            >
-              {m === "light" ? t.lightMode : t.darkMode}
-            </button>
-          ))}
-        </div>
+        <Tabs value={mode} onValueChange={(v) => setMode(v as "light" | "dark")}>
+          <TabsList>
+            <TabsTrigger value="light">{t.lightMode}</TabsTrigger>
+            <TabsTrigger value="dark">{t.darkMode}</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Body */}
