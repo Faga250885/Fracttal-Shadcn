@@ -90,7 +90,7 @@ export function LeftPanel({
                         "w-full text-left px-4 py-1.5 rounded-md text-sm transition-colors",
                         selectedId === comp.id
                           ? "bg-blue-600 text-white font-medium"
-                          : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                          : "text-zinc-400 hover:bg-[rgba(146,187,255,0.1)] hover:text-zinc-100",
                       ].join(" ")}
                     >
                       {comp.name}
