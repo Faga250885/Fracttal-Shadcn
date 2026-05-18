@@ -55,7 +55,10 @@ function ControlField({ propName, control, value, onChange }: ControlFieldProps)
   const label =
     propName === "children"
       ? "Label"
-      : propName.charAt(0).toUpperCase() + propName.slice(1)
+      : propName
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^(.)/, (s) => s.toUpperCase())
+          .trim()
 
   if (control.type === "select") {
     return (
