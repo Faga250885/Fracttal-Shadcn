@@ -717,10 +717,20 @@ export default function Example() {
         options: ["single", "range"],
         defaultValue: "single",
       },
+      numberOfMonths: {
+        type: "select",
+        options: ["1", "2"],
+        defaultValue: "1",
+      },
       showOutsideDays: { type: "boolean", defaultValue: true },
     },
     render: (props) => {
-      const { mode, showOutsideDays } = props as { mode: string; showOutsideDays: boolean }
+      const { mode, showOutsideDays, numberOfMonths } = props as {
+        mode: string
+        showOutsideDays: boolean
+        numberOfMonths: string
+      }
+      const months = Number(numberOfMonths) || 1
 
       function SingleCalendar() {
         const [date, setDate] = React.useState<Date | undefined>(undefined)
@@ -729,6 +739,7 @@ export default function Example() {
             mode="single"
             selected={date}
             onSelect={setDate}
+            numberOfMonths={months}
             showOutsideDays={showOutsideDays}
             className="rounded-xl border border-zinc-200 dark:border-zinc-700"
           />
@@ -742,6 +753,7 @@ export default function Example() {
             mode="range"
             selected={range}
             onSelect={setRange as never}
+            numberOfMonths={months}
             showOutsideDays={showOutsideDays}
             className="rounded-xl border border-zinc-200 dark:border-zinc-700"
           />
@@ -751,17 +763,22 @@ export default function Example() {
       return mode === "range" ? <RangeCalendar /> : <SingleCalendar />
     },
     generateCode: (props) => {
-      const { mode, showOutsideDays } = props as { mode: string; showOutsideDays: boolean }
+      const { mode, showOutsideDays, numberOfMonths } = props as {
+        mode: string
+        showOutsideDays: boolean
+        numberOfMonths: string
+      }
       const isRange = mode === "range"
+      const months = Number(numberOfMonths) || 1
       const stateVar = isRange ? "range" : "date"
       const stateSetter = isRange ? "setRange" : "setDate"
       const stateType = isRange ? `{ from: Date | undefined; to?: Date } | undefined` : `Date | undefined`
-      const rangeImport = isRange ? `\nimport type { DateRange } from "react-day-picker"` : ""
 
       const attrs = [
         `mode="${mode}"`,
         `selected={${stateVar}}`,
         `onSelect={${stateSetter}}`,
+        months > 1 && `numberOfMonths={${months}}`,
         !showOutsideDays && `showOutsideDays={false}`,
         `className="rounded-xl border border-zinc-200"`,
       ].filter(Boolean) as string[]
@@ -771,7 +788,7 @@ export default function Example() {
 
       return `"use client"
 
-import { useState } from "react"${rangeImport}
+import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 
 export default function Example() {
