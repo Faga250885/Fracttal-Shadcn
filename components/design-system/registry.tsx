@@ -7,6 +7,12 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import {
+  AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
+  AlertDialogFooter, AlertDialogTitle, AlertDialogDescription,
+  AlertDialogAction, AlertDialogCancel, AlertDialogMedia,
+} from "@/components/ui/alert-dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -1116,6 +1122,191 @@ export default function Example() {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  )
+}`
+    },
+  },
+
+  // ─── ACCORDION ───────────────────────────────────────────────────────────────
+  {
+    id: "accordion",
+    name: "Accordion",
+    description: {
+      en: "A vertically stacked set of interactive headings that reveal or hide associated content.",
+      es: "Un conjunto de encabezados interactivos apilados verticalmente que muestran u ocultan contenido.",
+    },
+    category: "Components",
+    filePath: "components/ui/accordion.tsx",
+    controls: {
+      type:         { type: "select",  options: ["single", "multiple"], defaultValue: "single" },
+      itemCount:    { type: "select",  options: ["2", "3", "4"], defaultValue: "3" },
+      collapsible:  { type: "boolean", defaultValue: true },
+      defaultOpen:  { type: "boolean", defaultValue: true },
+      disabled:     { type: "boolean", defaultValue: false },
+    },
+    render: (props) => {
+      const { type, itemCount, collapsible, defaultOpen, disabled } = props as {
+        type: "single" | "multiple"
+        itemCount: string
+        collapsible: boolean
+        defaultOpen: boolean
+        disabled: boolean
+      }
+      const count = Number(itemCount) || 3
+      const items = [
+        { value: "item-1", trigger: "Is it accessible?",           content: "Yes. It adheres to the WAI-ARIA design pattern." },
+        { value: "item-2", trigger: "Is it styled?",               content: "Yes. It comes with default styles that match the other components' aesthetic." },
+        { value: "item-3", trigger: "Is it animated?",             content: "Yes. It's animated by default, but you can disable it if you prefer." },
+        { value: "item-4", trigger: "Can I customize it?",         content: "Yes. You can customize the styles using Tailwind CSS classes." },
+      ].slice(0, count)
+
+      const accordionProps =
+        type === "single"
+          ? { type: "single" as const, defaultValue: defaultOpen ? "item-1" : undefined, collapsible }
+          : { type: "multiple" as const, defaultValue: defaultOpen ? ["item-1"] : [] }
+
+      return (
+        <Accordion {...accordionProps} className="w-80">
+          {items.map((item) => (
+            <AccordionItem key={item.value} value={item.value} disabled={disabled}>
+              <AccordionTrigger>{item.trigger}</AccordionTrigger>
+              <AccordionContent>{item.content}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      )
+    },
+    generateCode: (props) => {
+      const { type, itemCount, collapsible, defaultOpen, disabled } = props as {
+        type: string; itemCount: string; collapsible: boolean; defaultOpen: boolean; disabled: boolean
+      }
+      const count = Number(itemCount) || 3
+      const items = [
+        { value: "item-1", trigger: "Is it accessible?",   content: "Yes. It adheres to the WAI-ARIA design pattern." },
+        { value: "item-2", trigger: "Is it styled?",        content: "Yes. It comes with default styles that match the other components' aesthetic." },
+        { value: "item-3", trigger: "Is it animated?",      content: "Yes. It's animated by default, but you can disable it if you prefer." },
+        { value: "item-4", trigger: "Can I customize it?",  content: "Yes. You can customize the styles using Tailwind CSS classes." },
+      ].slice(0, count)
+
+      const rootAttrs: string[] = [`type="${type}"`]
+      if (type === "single") {
+        if (defaultOpen) rootAttrs.push(`defaultValue="item-1"`)
+        if (collapsible) rootAttrs.push(`collapsible`)
+      } else {
+        if (defaultOpen) rootAttrs.push(`defaultValue={["item-1"]}`)
+      }
+
+      const itemRows = items.map(item => {
+        const disabledAttr = disabled ? " disabled" : ""
+        return [
+          `  <AccordionItem value="${item.value}"${disabledAttr}>`,
+          `    <AccordionTrigger>${item.trigger}</AccordionTrigger>`,
+          `    <AccordionContent>${item.content}</AccordionContent>`,
+          `  </AccordionItem>`,
+        ].join("\n")
+      }).join("\n")
+
+      const attrStr = rootAttrs.join(" ")
+      const body = `<Accordion ${attrStr} className="w-80">\n${itemRows}\n</Accordion>`
+      const indented = body.split("\n").map(l => `    ${l}`).join("\n")
+      return `import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
+    },
+  },
+
+  // ─── ALERT DIALOG ────────────────────────────────────────────────────────────
+  {
+    id: "alert-dialog",
+    name: "Alert Dialog",
+    description: {
+      en: "A modal dialog that interrupts the user with important content and expects a response.",
+      es: "Un diálogo modal que interrumpe al usuario con contenido importante y espera una respuesta.",
+    },
+    category: "Components",
+    filePath: "components/ui/alert-dialog.tsx",
+    controls: {
+      triggerLabel:  { type: "text",    defaultValue: "Delete account" },
+      title:         { type: "text",    defaultValue: "Are you absolutely sure?" },
+      description:   { type: "text",    defaultValue: "This action cannot be undone. This will permanently delete your account and remove your data from our servers." },
+      actionLabel:   { type: "text",    defaultValue: "Continue" },
+      cancelLabel:   { type: "text",    defaultValue: "Cancel" },
+      size:          { type: "select",  options: ["default", "sm"], defaultValue: "default" },
+      actionVariant: { type: "select",  options: ["default", "destructive", "outline", "secondary"], defaultValue: "destructive" },
+      showMedia:     { type: "boolean", defaultValue: false },
+    },
+    render: (props) => {
+      const { triggerLabel, title, description, actionLabel, cancelLabel, size, actionVariant, showMedia } = props as {
+        triggerLabel: string; title: string; description: string
+        actionLabel: string; cancelLabel: string
+        size: "default" | "sm"; actionVariant: "default" | "destructive" | "outline" | "secondary"
+        showMedia: boolean
+      }
+      return (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline">{triggerLabel || "Open dialog"}</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent size={size}>
+            <AlertDialogHeader>
+              {showMedia && (
+                <AlertDialogMedia>
+                  <AlertCircle />
+                </AlertDialogMedia>
+              )}
+              <AlertDialogTitle>{title || "Are you sure?"}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {description || "This action cannot be undone."}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{cancelLabel || "Cancel"}</AlertDialogCancel>
+              <AlertDialogAction variant={actionVariant}>
+                {actionLabel || "Continue"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )
+    },
+    generateCode: (props) => {
+      const { triggerLabel, title, description, actionLabel, cancelLabel, size, actionVariant, showMedia } = props as {
+        triggerLabel: string; title: string; description: string
+        actionLabel: string; cancelLabel: string; size: string
+        actionVariant: string; showMedia: boolean
+      }
+      const sizeAttr   = size !== "default"          ? ` size="${size}"`             : ""
+      const actionAttr = actionVariant !== "default"  ? ` variant="${actionVariant}"` : ""
+      const mediaBlock = showMedia
+        ? `\n              <AlertDialogMedia>\n                <AlertCircle />\n              </AlertDialogMedia>`
+        : ""
+      const iconLine = showMedia ? `import { AlertCircle } from "lucide-react"\n` : ""
+      const named = ["AlertDialog", "AlertDialogAction", "AlertDialogCancel",
+        "AlertDialogContent", "AlertDialogDescription", "AlertDialogFooter",
+        "AlertDialogHeader", showMedia ? "AlertDialogMedia" : null,
+        "AlertDialogTitle", "AlertDialogTrigger"].filter(Boolean).join(", ")
+      return `${iconLine}import { Button } from "@/components/ui/button"
+import {
+  ${named}
+} from "@/components/ui/alert-dialog"
+
+export default function Example() {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">${triggerLabel || "Open dialog"}</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent${sizeAttr}>
+        <AlertDialogHeader>${mediaBlock}
+          <AlertDialogTitle>${title || "Are you sure?"}</AlertDialogTitle>
+          <AlertDialogDescription>
+            ${description || "This action cannot be undone."}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>${cancelLabel || "Cancel"}</AlertDialogCancel>
+          <AlertDialogAction${actionAttr}>${actionLabel || "Continue"}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }`
     },
