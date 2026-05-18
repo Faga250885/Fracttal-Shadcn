@@ -17,6 +17,7 @@ function Calendar({
   showOutsideDays = true,
   captionLayout = "label",
   buttonVariant = "ghost",
+  numberOfMonths = 1,
   formatters,
   components,
   ...props
@@ -25,9 +26,16 @@ function Calendar({
 }) {
   const defaultClassNames = getDefaultClassNames()
 
+  // min-w per month = 7 cells + p-3 both sides (1.5rem)
+  // for N months: N * (7*cell + 1.5rem) + (N-1) * gap-4 (1rem)
+  const rootMinW = numberOfMonths === 2
+    ? "min-w-[calc(var(--cell-size)*14+4rem)]"
+    : "min-w-[calc(var(--cell-size)*7+1.5rem)]"
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      numberOfMonths={numberOfMonths}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2.5rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -41,9 +49,11 @@ function Calendar({
         ...formatters,
       }}
       classNames={{
-        root: cn("w-fit min-w-[calc(var(--cell-size)*7+1.5rem)]", defaultClassNames.root),
+        root: cn(`w-fit ${rootMinW}`, defaultClassNames.root),
         months: cn(
-          "relative flex flex-col gap-4 md:flex-row",
+          numberOfMonths === 2
+            ? "relative flex flex-row gap-4"
+            : "relative flex flex-col gap-4 md:flex-row",
           defaultClassNames.months
         ),
         month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
