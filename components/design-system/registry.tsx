@@ -3,6 +3,7 @@
 import { Loader2, Search, Mail, User, Lock, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import {
   Select, SelectContent, SelectGroup, SelectItem,
@@ -554,6 +555,72 @@ ${indented}
         : "Select, SelectContent, SelectItem, SelectTrigger, SelectValue"
 
       return `import { ${named} } from "@/components/ui/select"
+
+export default function Example() {
+  return (
+${indented}
+  )
+}`
+    },
+  },
+  {
+    id: "switch",
+    name: "Switch",
+    description: {
+      en: "A control that allows the user to toggle between checked and unchecked states.",
+      es: "Un control que permite al usuario alternar entre estados activado y desactivado.",
+    },
+    category: "Components",
+    filePath: "components/ui/switch.tsx",
+    controls: {
+      checked: { type: "boolean", defaultValue: false },
+      size: {
+        type: "select",
+        options: ["default", "sm", "lg"],
+        defaultValue: "default",
+      },
+      disabled: { type: "boolean", defaultValue: false },
+    },
+    render: (props) => {
+      const { checked, size, disabled } = props as {
+        checked: boolean
+        size: "default" | "sm" | "lg"
+        disabled: boolean
+      }
+      return (
+        <Switch
+          key={String(checked)}
+          defaultChecked={checked}
+          size={size}
+          disabled={disabled}
+        />
+      )
+    },
+    generateCode: (props) => {
+      const { checked, size, disabled } = props as {
+        checked: boolean
+        size: string
+        disabled: boolean
+      }
+
+      const attrs: string[] = []
+      if (checked) attrs.push("defaultChecked")
+      if (size !== "default") attrs.push(`size="${size}"`)
+      if (disabled) attrs.push("disabled")
+
+      const attrStr = attrs.length === 0
+        ? ""
+        : attrs.length === 1
+          ? ` ${attrs[0]}`
+          : `\n  ${attrs.join("\n  ")}\n`
+
+      const tag = attrs.length >= 2
+        ? `<Switch${attrStr}/>`
+        : `<Switch${attrStr} />`
+
+      const indented = tag.split("\n").map((l) => `    ${l}`).join("\n")
+
+      return `import { Switch } from "@/components/ui/switch"
 
 export default function Example() {
   return (
