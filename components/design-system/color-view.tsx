@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check } from "lucide-react"
+import { Check, Sun, Moon } from "lucide-react"
 import { colorGroups } from "./colors"
 import { translations, type Lang } from "./i18n"
 import { cn } from "@/lib/utils"
@@ -60,8 +60,8 @@ export function ColorView({ lang }: ColorViewProps) {
         {/* Toggle */}
         <Tabs value={mode} onValueChange={(v) => setMode(v as "light" | "dark")}>
           <TabsList>
-            <TabsTrigger value="light">{t.lightMode}</TabsTrigger>
-            <TabsTrigger value="dark">{t.darkMode}</TabsTrigger>
+            <TabsTrigger value="light" aria-label={t.lightMode}><Sun className="size-3.5" /></TabsTrigger>
+            <TabsTrigger value="dark" aria-label={t.darkMode}><Moon className="size-3.5" /></TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

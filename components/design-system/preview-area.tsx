@@ -58,13 +58,11 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
             <div className="absolute top-3 right-3">
               <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
                 <TabsList className="h-7 p-0.5">
-                  <TabsTrigger value="light" className="h-6 px-2 gap-1 text-[11px]">
-                    <Sun className="size-3" />
-                    {t.lightMode}
+                  <TabsTrigger value="light" className="h-6 w-7 px-0">
+                    <Sun className="size-3.5" />
                   </TabsTrigger>
-                  <TabsTrigger value="dark" className="h-6 px-2 gap-1 text-[11px]">
-                    <Moon className="size-3" />
-                    {t.darkMode}
+                  <TabsTrigger value="dark" className="h-6 w-7 px-0">
+                    <Moon className="size-3.5" />
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
