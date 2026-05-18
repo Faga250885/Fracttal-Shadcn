@@ -1,9 +1,12 @@
 "use client"
 
+import React from "react"
 import { Loader2, Search, Mail, User, Lock, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import {
   Select, SelectContent, SelectGroup, SelectItem,
@@ -623,6 +626,156 @@ ${indented}
       return `import { Switch } from "@/components/ui/switch"
 
 export default function Example() {
+  return (
+${indented}
+  )
+}`
+    },
+  },
+  {
+    id: "tooltip",
+    name: "Tooltip",
+    description: {
+      en: "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
+      es: "Un popup que muestra información relacionada con un elemento al recibir el foco o pasar el cursor sobre él.",
+    },
+    category: "Components",
+    filePath: "components/ui/tooltip.tsx",
+    controls: {
+      content: { type: "text", defaultValue: "This is a tooltip" },
+      side: {
+        type: "select",
+        options: ["top", "right", "bottom", "left"],
+        defaultValue: "top",
+      },
+      trigger: { type: "text", defaultValue: "Hover me" },
+    },
+    render: (props) => {
+      const { content, side, trigger } = props as {
+        content: string
+        side: "top" | "right" | "bottom" | "left"
+        trigger: string
+      }
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline">{trigger || "Hover me"}</Button>
+            </TooltipTrigger>
+            <TooltipContent side={side}>
+              {content || "This is a tooltip"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )
+    },
+    generateCode: (props) => {
+      const { content, side, trigger } = props as {
+        content: string
+        side: string
+        trigger: string
+      }
+
+      const contentAttrs = side !== "top" ? ` side="${side}"` : ""
+
+      return `import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+export default function Example() {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">${trigger || "Hover me"}</Button>
+        </TooltipTrigger>
+        <TooltipContent${contentAttrs}>
+          ${content || "This is a tooltip"}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}`
+    },
+  },
+  {
+    id: "calendar",
+    name: "Calendar",
+    description: {
+      en: "A calendar component for selecting single dates or date ranges.",
+      es: "Un componente de calendario para seleccionar fechas individuales o rangos de fechas.",
+    },
+    category: "Components",
+    filePath: "components/ui/calendar.tsx",
+    controls: {
+      mode: {
+        type: "select",
+        options: ["single", "range"],
+        defaultValue: "single",
+      },
+      showOutsideDays: { type: "boolean", defaultValue: true },
+    },
+    render: (props) => {
+      const { mode, showOutsideDays } = props as { mode: string; showOutsideDays: boolean }
+
+      function SingleCalendar() {
+        const [date, setDate] = React.useState<Date | undefined>(undefined)
+        return (
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            showOutsideDays={showOutsideDays}
+            className="rounded-xl border border-zinc-200 dark:border-zinc-700"
+          />
+        )
+      }
+
+      function RangeCalendar() {
+        const [range, setRange] = React.useState<{ from: Date | undefined; to?: Date } | undefined>(undefined)
+        return (
+          <Calendar
+            mode="range"
+            selected={range}
+            onSelect={setRange as never}
+            showOutsideDays={showOutsideDays}
+            className="rounded-xl border border-zinc-200 dark:border-zinc-700"
+          />
+        )
+      }
+
+      return mode === "range" ? <RangeCalendar /> : <SingleCalendar />
+    },
+    generateCode: (props) => {
+      const { mode, showOutsideDays } = props as { mode: string; showOutsideDays: boolean }
+      const isRange = mode === "range"
+      const stateVar = isRange ? "range" : "date"
+      const stateSetter = isRange ? "setRange" : "setDate"
+      const stateType = isRange ? `{ from: Date | undefined; to?: Date } | undefined` : `Date | undefined`
+      const rangeImport = isRange ? `\nimport type { DateRange } from "react-day-picker"` : ""
+
+      const attrs = [
+        `mode="${mode}"`,
+        `selected={${stateVar}}`,
+        `onSelect={${stateSetter}}`,
+        !showOutsideDays && `showOutsideDays={false}`,
+        `className="rounded-xl border border-zinc-200"`,
+      ].filter(Boolean) as string[]
+
+      const calendarJsx = ["<Calendar", ...attrs.map(a => `  ${a}`), "/>"].join("\n")
+      const indented = calendarJsx.split("\n").map(l => `    ${l}`).join("\n")
+
+      return `"use client"
+
+import { useState } from "react"${rangeImport}
+import { Calendar } from "@/components/ui/calendar"
+
+export default function Example() {
+  const [${stateVar}, ${stateSetter}] = useState<${stateType}>(undefined)
   return (
 ${indented}
   )

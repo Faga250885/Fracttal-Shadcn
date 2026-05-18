@@ -49,7 +49,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
           {/* Canvas */}
           <div
             className={[
-              "relative min-h-[260px] flex items-center justify-center p-4 rounded-xl overflow-hidden transition-colors duration-200",
+              "relative min-h-[260px] flex items-center justify-center p-4 rounded-xl transition-colors duration-200",
               isDark ? "bg-zinc-900 dark text-foreground border border-transparent" : "bg-white text-foreground border border-zinc-100",
             ].join(" ")}
           >
