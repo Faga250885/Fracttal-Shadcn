@@ -59,9 +59,9 @@ export function ColorView({ lang }: ColorViewProps) {
 
         {/* Toggle */}
         <Tabs value={mode} onValueChange={(v) => setMode(v as "light" | "dark")}>
-          <TabsList>
-            <TabsTrigger value="light" aria-label={t.lightMode}><Sun className="size-3.5" /></TabsTrigger>
-            <TabsTrigger value="dark" aria-label={t.darkMode}><Moon className="size-3.5" /></TabsTrigger>
+          <TabsList className="h-7 p-0.5">
+            <TabsTrigger value="light" className="h-6 w-7 px-0" aria-label={t.lightMode}><Sun className="size-3.5" /></TabsTrigger>
+            <TabsTrigger value="dark" className="h-6 w-7 px-0" aria-label={t.darkMode}><Moon className="size-3.5" /></TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
