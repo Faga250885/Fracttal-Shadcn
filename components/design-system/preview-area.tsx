@@ -36,7 +36,7 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
         <div className="px-4 pt-4">
           {/* Title row — above the canvas */}
           <div className="flex items-center gap-4 mb-4">
-            <h2 className="text-sm font-semibold text-zinc-800">Vista previa</h2>
+            <h2 className="text-sm font-semibold text-zinc-800">Preview</h2>
             {component && (
               <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
                 {component.filePath}
@@ -60,8 +60,8 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
             >
               <button
                 onClick={() => setMode("light")}
-                aria-label="Modo claro"
-                title="Modo claro"
+                aria-label="Light mode"
+                title="Light mode"
                 className={[
                   "p-1.5 rounded-md transition-all",
                   !isDark
@@ -73,8 +73,8 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
               </button>
               <button
                 onClick={() => setMode("dark")}
-                aria-label="Modo oscuro"
-                title="Modo oscuro"
+                aria-label="Dark mode"
+                title="Dark mode"
                 className={[
                   "p-1.5 rounded-md transition-all",
                   isDark
@@ -90,7 +90,7 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
               component.render(propValues)
             ) : (
               <p className="text-sm text-zinc-400">
-                Selecciona un componente del panel izquierdo
+                Select a component from the left panel
               </p>
             )}
           </div>
@@ -101,10 +101,10 @@ export function PreviewArea({ component, propValues }: PreviewAreaProps) {
           <div className="p-4 bg-white">
             <div className="flex items-center gap-4 mb-4">
               <h2 className="text-sm font-semibold text-zinc-800">
-                Implementación
+                Implementation
               </h2>
               <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
-                Copia y pega en tu proyecto
+                Copy and paste in your project
               </span>
             </div>
             <CodeBlock code={component.generateCode(propValues)} />

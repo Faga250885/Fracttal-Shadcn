@@ -16,7 +16,7 @@ export const components: ComponentEntry[] = [
     name: "Button",
     description:
       "Displays a button or a component that looks like a button.",
-    category: "Componentes",
+    category: "Components",
     filePath: "components/ui/button.tsx",
     controls: {
       children: { type: "text", defaultValue: "Button" },
@@ -110,7 +110,7 @@ ${indented}
     id: "input",
     name: "Input",
     description: "Displays a form input field for text-based data entry.",
-    category: "Componentes",
+    category: "Components",
     filePath: "components/ui/input.tsx",
     controls: {
       type: {
@@ -119,7 +119,7 @@ ${indented}
         defaultValue: "email",
       },
       label: { type: "text", defaultValue: "Email" },
-      placeholder: { type: "text", defaultValue: "tucorreo@ejemplo.com" },
+      placeholder: { type: "text", defaultValue: "your@email.com" },
       description: { type: "text", defaultValue: "" },
       disabled: { type: "boolean", defaultValue: false },
       required: { type: "boolean", defaultValue: false },
@@ -130,14 +130,14 @@ ${indented}
     cascade: (key, value) => {
       if (key !== "type") return {}
       const presets: Record<string, { label: string; placeholder: string }> = {
-        text:     { label: "Nombre",      placeholder: "Ej. Juan García" },
-        email:    { label: "Email",       placeholder: "tucorreo@ejemplo.com" },
-        password: { label: "Contraseña",  placeholder: "••••••••" },
-        number:   { label: "Cantidad",    placeholder: "0" },
-        search:   { label: "",            placeholder: "Buscar..." },
-        url:      { label: "Sitio web",   placeholder: "https://ejemplo.com" },
-        tel:      { label: "Teléfono",    placeholder: "+34 600 000 000" },
-        file:     { label: "Archivo",     placeholder: "" },
+        text:     { label: "Name",     placeholder: "e.g. John Smith" },
+        email:    { label: "Email",    placeholder: "your@email.com" },
+        password: { label: "Password", placeholder: "••••••••" },
+        number:   { label: "Amount",   placeholder: "0" },
+        search:   { label: "",         placeholder: "Search..." },
+        url:      { label: "Website",  placeholder: "https://example.com" },
+        tel:      { label: "Phone",    placeholder: "+1 800 000 0000" },
+        file:     { label: "File",     placeholder: "" },
       }
       return presets[value as string] ?? {}
     },
@@ -183,14 +183,14 @@ ${indented}
           {showButton ? (
             <div className="flex gap-2">
               {inputEl}
-              <Button size="sm">Enviar</Button>
+              <Button size="sm">Send</Button>
             </div>
           ) : inputEl}
           {description && !invalid && (
             <p className="text-xs text-muted-foreground">{description}</p>
           )}
           {invalid && (
-            <p className="text-xs text-destructive">El campo no es válido.</p>
+            <p className="text-xs text-destructive">This field is not valid.</p>
           )}
         </div>
       )
@@ -242,13 +242,13 @@ ${indented}
         : ""
 
       const errorLine = invalid
-        ? `\n    <p className="text-xs text-destructive">El campo no es válido.</p>`
+        ? `\n    <p className="text-xs text-destructive">This field is not valid.</p>`
         : ""
 
-      const buttonLine = showButton ? `\n    <Button>Enviar</Button>` : ""
+      const buttonLine = showButton ? `\n    <Button>Send</Button>` : ""
 
       const inner = showButton
-        ? `${labelLine}<div className="flex gap-2">\n      ${wrappedInput.split("\n").join("\n      ")}\n      <Button>Enviar</Button>\n    </div>${descLine}${errorLine}`
+        ? `${labelLine}<div className="flex gap-2">\n      ${wrappedInput.split("\n").join("\n      ")}\n      <Button>Send</Button>\n    </div>${descLine}${errorLine}`
         : `${labelLine}${wrappedInput}${descLine}${errorLine}`
 
       const indented = inner
@@ -277,7 +277,7 @@ ${indented}
     id: "tabs",
     name: "Tabs",
     description: "A set of layered sections of content — known as tab panels — that are displayed one at a time.",
-    category: "Componentes",
+    category: "Components",
     filePath: "components/ui/tabs.tsx",
     controls: {
       variant: {
@@ -290,9 +290,9 @@ ${indented}
         options: ["horizontal", "vertical"],
         defaultValue: "horizontal",
       },
-      tab1: { type: "text", defaultValue: "Cuenta" },
-      tab2: { type: "text", defaultValue: "Contraseña" },
-      tab3: { type: "text", defaultValue: "Notificaciones" },
+      tab1: { type: "text", defaultValue: "Account" },
+      tab2: { type: "text", defaultValue: "Password" },
+      tab3: { type: "text", defaultValue: "Notifications" },
       disabled: { type: "boolean", defaultValue: false },
       icons: {
         type: "select",
@@ -328,7 +328,7 @@ ${indented}
           {keys.map((k, i) => (
             <TabsContent key={k} value={k}>
               <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
-                Contenido de {labels[i]}
+                Content of {labels[i]}
               </div>
             </TabsContent>
           ))}
@@ -376,7 +376,7 @@ ${indented}
       const panels = keys.map((k, i) => [
         `<TabsContent value="${k}">`,
         `  <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">`,
-        `    Contenido de ${labels[i]}`,
+        `    Content of ${labels[i]}`,
         `  </div>`,
         `</TabsContent>`,
       ].join("\n")).join("\n")
@@ -408,10 +408,10 @@ ${indented}
     id: "select",
     name: "Select",
     description: "Displays a list of options for the user to pick from — triggered by a button.",
-    category: "Componentes",
+    category: "Components",
     filePath: "components/ui/select.tsx",
     controls: {
-      placeholder: { type: "text", defaultValue: "Selecciona una opción" },
+      placeholder: { type: "text", defaultValue: "Select an option" },
       size: {
         type: "select",
         options: ["default", "sm"],
@@ -437,31 +437,31 @@ ${indented}
             disabled={disabled}
             aria-invalid={invalid ? "true" : undefined}
           >
-            <SelectValue placeholder={placeholder || "Selecciona una opción"} />
+            <SelectValue placeholder={placeholder || "Select an option"} />
           </SelectTrigger>
           <SelectContent>
             {groups ? (
               <>
                 <SelectGroup>
-                  <SelectLabel>Frutas</SelectLabel>
-                  <SelectItem value="manzana">Manzana</SelectItem>
-                  <SelectItem value="naranja">Naranja</SelectItem>
+                  <SelectLabel>Fruits</SelectLabel>
+                  <SelectItem value="apple">Apple</SelectItem>
+                  <SelectItem value="orange">Orange</SelectItem>
                   <SelectItem value="banana">Banana</SelectItem>
                 </SelectGroup>
                 <SelectSeparator />
                 <SelectGroup>
-                  <SelectLabel>Verduras</SelectLabel>
-                  <SelectItem value="zanahoria">Zanahoria</SelectItem>
-                  <SelectItem value="brocoli">Brócoli</SelectItem>
-                  <SelectItem value="espinaca">Espinaca</SelectItem>
+                  <SelectLabel>Vegetables</SelectLabel>
+                  <SelectItem value="carrot">Carrot</SelectItem>
+                  <SelectItem value="broccoli">Broccoli</SelectItem>
+                  <SelectItem value="spinach">Spinach</SelectItem>
                 </SelectGroup>
               </>
             ) : (
               <>
-                <SelectItem value="manzana">Manzana</SelectItem>
-                <SelectItem value="naranja">Naranja</SelectItem>
+                <SelectItem value="apple">Apple</SelectItem>
+                <SelectItem value="orange">Orange</SelectItem>
                 <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="uva">Uva</SelectItem>
+                <SelectItem value="grape">Grape</SelectItem>
                 <SelectItem value="mango">Mango</SelectItem>
               </>
             )}
@@ -484,29 +484,29 @@ ${indented}
       if (invalid) triggerAttrs.push('aria-invalid="true"')
 
       const triggerAttrStr = triggerAttrs.join(" ")
-      const ph = placeholder || "Selecciona una opción"
+      const ph = placeholder || "Select an option"
 
       const items = groups
         ? [
             `<SelectGroup>`,
-            `  <SelectLabel>Frutas</SelectLabel>`,
-            `  <SelectItem value="manzana">Manzana</SelectItem>`,
-            `  <SelectItem value="naranja">Naranja</SelectItem>`,
+            `  <SelectLabel>Fruits</SelectLabel>`,
+            `  <SelectItem value="apple">Apple</SelectItem>`,
+            `  <SelectItem value="orange">Orange</SelectItem>`,
             `  <SelectItem value="banana">Banana</SelectItem>`,
             `</SelectGroup>`,
             `<SelectSeparator />`,
             `<SelectGroup>`,
-            `  <SelectLabel>Verduras</SelectLabel>`,
-            `  <SelectItem value="zanahoria">Zanahoria</SelectItem>`,
-            `  <SelectItem value="brocoli">Brócoli</SelectItem>`,
-            `  <SelectItem value="espinaca">Espinaca</SelectItem>`,
+            `  <SelectLabel>Vegetables</SelectLabel>`,
+            `  <SelectItem value="carrot">Carrot</SelectItem>`,
+            `  <SelectItem value="broccoli">Broccoli</SelectItem>`,
+            `  <SelectItem value="spinach">Spinach</SelectItem>`,
             `</SelectGroup>`,
           ].join("\n")
         : [
-            `<SelectItem value="manzana">Manzana</SelectItem>`,
-            `<SelectItem value="naranja">Naranja</SelectItem>`,
+            `<SelectItem value="apple">Apple</SelectItem>`,
+            `<SelectItem value="orange">Orange</SelectItem>`,
             `<SelectItem value="banana">Banana</SelectItem>`,
-            `<SelectItem value="uva">Uva</SelectItem>`,
+            `<SelectItem value="grape">Grape</SelectItem>`,
             `<SelectItem value="mango">Mango</SelectItem>`,
           ].join("\n")
 
