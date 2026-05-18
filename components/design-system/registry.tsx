@@ -891,7 +891,7 @@ export const components: ComponentEntry[] = [
           {description && <AlertDescription>{description}</AlertDescription>}
           {showAction && (
             <AlertAction>
-              <Button size="xs" variant="secondary">Dismiss</Button>
+              <Button size="xs">Dismiss</Button>
             </AlertAction>
           )}
         </Alert>
@@ -905,7 +905,7 @@ export const components: ComponentEntry[] = [
       const iconTag = showIcon ? (variant === "destructive" ? `\n  <AlertCircle />` : `\n  <Info />`) : ""
       const titleTag = title ? `\n  <AlertTitle>${title}</AlertTitle>` : ""
       const descTag  = description ? `\n  <AlertDescription>${description}</AlertDescription>` : ""
-      const actionTag = showAction ? `\n  <AlertAction>\n    <Button size="xs" variant="secondary">Dismiss</Button>\n  </AlertAction>` : ""
+      const actionTag = showAction ? `\n  <AlertAction>\n    <Button size="xs">Dismiss</Button>\n  </AlertAction>` : ""
       const body = `<Alert${variantAttr}>${iconTag}${titleTag}${descTag}${actionTag}\n</Alert>`
       const indented = body.split("\n").map(l=>`    ${l}`).join("\n")
       const iconName = showIcon ? (variant === "destructive" ? "AlertCircle" : "Info") : null
