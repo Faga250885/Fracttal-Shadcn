@@ -34,7 +34,7 @@ export function LeftPanel({
   const totalIcons = CATEGORY_COUNTS.reduce((acc, c) => acc + c.count, 0)
 
   return (
-    <aside className="dark w-[307px] shrink-0 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
+    <aside className="dark w-1/5 min-w-[290px] max-w-[380px] shrink-0 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
       {/* Brand header */}
       <div className="p-4 border-b border-zinc-800 h-[74px] flex flex-col justify-center">
         <div className="flex items-center gap-2">

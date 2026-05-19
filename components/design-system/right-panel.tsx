@@ -17,7 +17,7 @@ interface RightPanelProps {
 export function RightPanel({ component, propValues, onChange, lang }: RightPanelProps) {
   const t = translations[lang]
   return (
-    <aside className="w-[307px] shrink-0 flex flex-col bg-white border-l border-zinc-200">
+    <aside className="w-1/5 min-w-[240px] max-w-[380px] shrink-0 flex flex-col bg-white border-l border-zinc-200">
       <div className="p-4 border-b border-zinc-200 h-[74px] flex flex-col justify-center">
         <h2 className="text-base font-semibold text-zinc-800">{t.controls}</h2>
         <p className="text-[13px] text-zinc-400 mt-0.5">{t.configureHere}</p>
