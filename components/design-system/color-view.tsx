@@ -97,12 +97,7 @@ export function ColorView({ lang }: ColorViewProps) {
           >
             {/* Group label */}
             <div className="w-32 shrink-0 pt-1">
-              <span
-                className={cn(
-                  "text-[10px] font-semibold uppercase tracking-widest",
-                  isDark ? "text-zinc-600" : "text-zinc-300"
-                )}
-              >
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {group.name}
               </span>
             </div>
