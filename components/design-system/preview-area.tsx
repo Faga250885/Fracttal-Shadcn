@@ -91,6 +91,22 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
               isDark ? "bg-zinc-900 dark text-foreground border border-transparent" : "bg-white text-foreground border border-zinc-100",
             ].join(" ")}
           >
+            {/* Dot pattern — mesa de trabajo, opaca en bordes, transparente en centro */}
+            <div
+              aria-hidden
+              className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden"
+              style={{
+                backgroundImage: `radial-gradient(circle, ${
+                  isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.18)"
+                } 1px, transparent 1px)`,
+                backgroundSize: "14px 14px",
+                maskImage:
+                  "linear-gradient(to right, black 0%, transparent 22%, transparent 78%, black 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to right, black 0%, transparent 22%, transparent 78%, black 100%)",
+              }}
+            />
+
             {/* Summary chips — top left */}
             {component && (
               <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[55%]">
