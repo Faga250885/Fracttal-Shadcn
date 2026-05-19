@@ -47,7 +47,7 @@ export function LeftPanel({
       </div>
 
       {/* View toggle — Components / Colors / Icons */}
-      <div className="px-4 pt-4 pb-3 border-b border-zinc-800">
+      <div className="px-4 pt-4">
         <Tabs value={view} onValueChange={(v) => onViewChange(v as ViewMode)}>
           <TabsList className="w-full">
             <TabsTrigger value="components" className="flex-1 gap-1 text-[11px]">

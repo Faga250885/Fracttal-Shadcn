@@ -111,7 +111,7 @@ export const theme = {
     info:                    brandPalette.info,
     "info-foreground":       brandPalette.white,
 
-    radius:                  "0.625rem",
+    radius:                  "0.25rem",
   },
 
   // ── Modo oscuro ────────────────────────────────────────────────────────────
