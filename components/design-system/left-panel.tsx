@@ -41,7 +41,7 @@ export function LeftPanel({
           <img src="/isotipo.svg" alt="Fracttal" className="size-[42px]" />
           <div className="leading-none">
             <p className="text-base font-semibold text-white">Julia</p>
-            <p className="text-[13px] text-zinc-500 mt-0.5">Fracttal Design System</p>
+            <p className="text-[13px] text-zinc-500 mt-0.5">Design System</p>
           </div>
         </div>
       </div>
