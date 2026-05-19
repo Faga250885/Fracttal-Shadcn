@@ -4,6 +4,7 @@ import { Palette, Layers } from "lucide-react"
 import { categorizedComponents } from "./registry"
 import { colorGroups } from "./colors"
 import { translations, type Lang } from "./i18n"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export type ViewMode = "components" | "colors"
 
@@ -27,7 +28,7 @@ export function LeftPanel({
   const t = translations[lang]
 
   return (
-    <aside className="w-[307px] shrink-0 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
+    <aside className="dark w-[307px] shrink-0 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
       {/* Brand header */}
       <div className="p-4 border-b border-zinc-800 h-[74px] flex flex-col justify-center">
         <div className="flex items-center gap-2">
@@ -41,32 +42,18 @@ export function LeftPanel({
 
       {/* View toggle — Components / Colors */}
       <div className="px-4 pt-4 pb-3 border-b border-zinc-800">
-        <div className="flex gap-1 rounded-lg bg-zinc-900 p-0.5">
-          <button
-            onClick={() => onViewChange("components")}
-            className={[
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors cursor-pointer",
-              view === "components"
-                ? "bg-zinc-700 text-white shadow-sm"
-                : "text-zinc-500 hover:text-zinc-300",
-            ].join(" ")}
-          >
-            <Layers className="size-3.5" />
-            {t.components}
-          </button>
-          <button
-            onClick={() => onViewChange("colors")}
-            className={[
-              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[12px] font-medium transition-colors cursor-pointer",
-              view === "colors"
-                ? "bg-zinc-700 text-white shadow-sm"
-                : "text-zinc-500 hover:text-zinc-300",
-            ].join(" ")}
-          >
-            <Palette className="size-3.5" />
-            {t.colors}
-          </button>
-        </div>
+        <Tabs value={view} onValueChange={(v) => onViewChange(v as ViewMode)}>
+          <TabsList className="w-full">
+            <TabsTrigger value="components" className="flex-1 gap-1.5 text-[12px]">
+              <Layers className="size-3.5" />
+              {t.components}
+            </TabsTrigger>
+            <TabsTrigger value="colors" className="flex-1 gap-1.5 text-[12px]">
+              <Palette className="size-3.5" />
+              {t.colors}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Navigation content */}
