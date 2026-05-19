@@ -499,17 +499,16 @@ export default function Example() {
       mode:           { type: "select",  options: ["single","multiple","range"], defaultValue: "single" },
       numberOfMonths: { type: "select",  options: ["1","2"], defaultValue: "1" },
       showOutsideDays:{ type: "boolean", defaultValue: true },
-      showWeekNumber: { type: "boolean", defaultValue: false },
       fixedWeeks:     { type: "boolean", defaultValue: false },
     },
     render: (props) => {
-      const { mode, showOutsideDays, numberOfMonths, showWeekNumber, fixedWeeks } = props as {
+      const { mode, showOutsideDays, numberOfMonths, fixedWeeks } = props as {
         mode: string; showOutsideDays: boolean; numberOfMonths: string
-        showWeekNumber: boolean; fixedWeeks: boolean
+        fixedWeeks: boolean
       }
       const months = Number(numberOfMonths) || 1
       const cls = "rounded-xl border border-zinc-200 dark:border-zinc-700"
-      const shared = { numberOfMonths: months, showOutsideDays, showWeekNumber, fixedWeeks, className: cls }
+      const shared = { numberOfMonths: months, showOutsideDays, fixedWeeks, className: cls }
 
       function SingleCalendar() {
         const [date, setDate] = React.useState<Date | undefined>(undefined)
@@ -529,9 +528,9 @@ export default function Example() {
       return <SingleCalendar />
     },
     generateCode: (props) => {
-      const { mode, showOutsideDays, numberOfMonths, showWeekNumber, fixedWeeks } = props as {
+      const { mode, showOutsideDays, numberOfMonths, fixedWeeks } = props as {
         mode: string; showOutsideDays: boolean; numberOfMonths: string
-        showWeekNumber: boolean; fixedWeeks: boolean
+        fixedWeeks: boolean
       }
       const months = Number(numberOfMonths) || 1
       const isRange = mode === "range"
@@ -547,7 +546,6 @@ export default function Example() {
         `onSelect={${stateSetter}}`,
         months > 1 && `numberOfMonths={${months}}`,
         !showOutsideDays && `showOutsideDays={false}`,
-        showWeekNumber && `showWeekNumber`,
         fixedWeeks && `fixedWeeks`,
         `className="rounded-xl border border-zinc-200"`,
       ].filter(Boolean) as string[]
