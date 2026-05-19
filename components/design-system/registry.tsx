@@ -839,7 +839,7 @@ export default function Example() {
       ]
       return (
         <RadioGroup defaultValue="option1"
-          className={orientation === "horizontal" ? "flex flex-row gap-6" : "gap-3"}>
+          className={orientation === "horizontal" ? "flex flex-row gap-6 w-fit" : "gap-3 w-fit"}>
           {items.map((item, i) => (
             <div key={item.value} className="flex items-center gap-2">
               <RadioGroupItem value={item.value} id={item.value}
