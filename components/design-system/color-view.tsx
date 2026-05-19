@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Check, Sun, Moon } from "lucide-react"
 import { colorGroups } from "./colors"
+import { theme } from "@/theme/tokens"
 import { translations, type Lang } from "./i18n"
 import { cn } from "@/lib/utils"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,14 +12,40 @@ interface ColorViewProps {
   lang: Lang
 }
 
+// Lookup: "--primary" → valor resuelto para light/dark
+const lightMap = Object.fromEntries(
+  Object.entries(theme.light).map(([k, v]) => [`--${k}`, v as string])
+)
+const darkMap = Object.fromEntries(
+  Object.entries(theme.dark).map(([k, v]) => [`--${k}`, v as string])
+)
+
+/** Acorta valores largos de oklch para que quepan en el chip */
+function formatValue(value: string): string {
+  if (!value) return "—"
+  if (value.startsWith("#")) return value.toUpperCase()
+  // oklch(0.205 0 0) → oklch(0.21 0 0)
+  const match = value.match(/^oklch\(([^)]+)\)$/)
+  if (match) {
+    const parts = match[1].split(/\s+/)
+    const shortened = parts
+      .map((p) => (isNaN(Number(p)) ? p : String(parseFloat(Number(p).toFixed(2)))))
+      .join(" ")
+    return `oklch(${shortened})`
+  }
+  return value.length > 18 ? value.slice(0, 16) + "…" : value
+}
+
 export function ColorView({ lang }: ColorViewProps) {
   const [mode, setMode] = useState<"light" | "dark">("light")
   const [copied, setCopied] = useState<string | null>(null)
   const t = translations[lang]
   const isDark = mode === "dark"
+  const varMap = isDark ? darkMap : lightMap
 
   function handleCopy(variable: string) {
-    navigator.clipboard.writeText(`var(${variable})`).catch(() => {})
+    const value = varMap[variable] ?? `var(${variable})`
+    navigator.clipboard.writeText(value).catch(() => {})
     setCopied(variable)
     setTimeout(() => setCopied(null), 1500)
   }
@@ -84,15 +111,17 @@ export function ColorView({ lang }: ColorViewProps) {
             <div className="flex flex-wrap gap-x-3 gap-y-5">
               {group.swatches.map((swatch) => {
                 const isCopied = copied === swatch.variable
+                const rawValue = varMap[swatch.variable] ?? ""
+                const displayValue = formatValue(rawValue)
 
                 return (
                   <div key={swatch.variable} className="flex flex-col gap-2">
                     {/* Chip */}
                     <button
                       onClick={() => handleCopy(swatch.variable)}
-                      title={`var(${swatch.variable})`}
+                      title={rawValue}
                       className={cn(
-                        "group relative h-9 w-24 rounded-lg transition-all duration-150 cursor-pointer",
+                        "group relative h-14 w-24 rounded-lg overflow-hidden transition-all duration-150 cursor-pointer",
                         "hover:scale-[1.04] active:scale-[0.97]",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
                         isDark
@@ -103,11 +132,18 @@ export function ColorView({ lang }: ColorViewProps) {
                       )}
                       style={{ backgroundColor: `var(${swatch.variable})` }}
                     >
+                      {/* Value strip — bottom of chip */}
+                      <span className="absolute bottom-0 inset-x-0 px-1.5 py-1 bg-black/30 backdrop-blur-[2px] flex items-center justify-center">
+                        <span className="text-[8px] font-mono text-white/90 truncate leading-none">
+                          {displayValue}
+                        </span>
+                      </span>
+
                       {/* Copy overlay */}
                       <span
                         className={cn(
-                          "absolute inset-0 rounded-lg flex items-center justify-center transition-all duration-150",
-                          "bg-black/20 backdrop-blur-[1px]",
+                          "absolute inset-0 flex items-center justify-center transition-all duration-150",
+                          "bg-black/25 backdrop-blur-[1px]",
                           isCopied ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                         )}
                       >
