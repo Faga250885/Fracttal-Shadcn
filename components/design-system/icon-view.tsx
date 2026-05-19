@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
+import { createRoot } from "react-dom/client"
+import { flushSync } from "react-dom"
 import { Search, X, Copy, Download, Check } from "lucide-react"
-import { renderToStaticMarkup } from "react-dom/server"
-import { ALL_ICONS, ICONS_BY_CATEGORY, getIconCategory, type IconComponent } from "./icon-categories"
+import { ALL_ICONS, ICONS_BY_CATEGORY, type IconComponent } from "./icon-categories"
 import { translations, type Lang } from "./i18n"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -14,16 +15,30 @@ interface IconViewProps {
 }
 
 function downloadIconSVG(name: string, Icon: IconComponent) {
-  const svg = renderToStaticMarkup(
-    React.createElement(Icon as React.ComponentType<object>, { size: 24 })
-  )
-  const blob = new Blob([svg], { type: "image/svg+xml" })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement("a")
-  a.href = url
-  a.download = `${name}.svg`
-  a.click()
-  URL.revokeObjectURL(url)
+  // Render icon to a detached DOM node synchronously, then extract the SVG markup.
+  const container = document.createElement("div")
+  container.style.cssText = "position:absolute;visibility:hidden;pointer-events:none"
+  document.body.appendChild(container)
+
+  const root = createRoot(container)
+  flushSync(() => {
+    root.render(React.createElement(Icon as React.ComponentType<{ size?: number }>, { size: 24 }))
+  })
+
+  const svg = container.querySelector("svg")
+  if (svg) {
+    const svgStr = new XMLSerializer().serializeToString(svg)
+    const blob = new Blob([svgStr], { type: "image/svg+xml" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${name}.svg`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  root.unmount()
+  document.body.removeChild(container)
 }
 
 export function IconView({ lang, selectedCategory }: IconViewProps) {
