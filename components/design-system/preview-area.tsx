@@ -97,7 +97,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
               className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden"
               style={{
                 backgroundImage: `radial-gradient(circle, ${
-                  isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.18)"
+                  isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"
                 } 1px, transparent 1px)`,
                 backgroundSize: "14px 14px",
                 maskImage:
