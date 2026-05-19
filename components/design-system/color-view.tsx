@@ -121,7 +121,7 @@ export function ColorView({ lang }: ColorViewProps) {
                       onClick={() => handleCopy(swatch.variable)}
                       title={rawValue}
                       className={cn(
-                        "group relative h-14 w-24 rounded-lg overflow-hidden transition-all duration-150 cursor-pointer",
+                        "group relative h-9 w-24 rounded-lg overflow-hidden transition-all duration-150 cursor-pointer",
                         "hover:scale-[1.04] active:scale-[0.97]",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
                         isDark
@@ -132,13 +132,6 @@ export function ColorView({ lang }: ColorViewProps) {
                       )}
                       style={{ backgroundColor: `var(${swatch.variable})` }}
                     >
-                      {/* Value strip — bottom of chip */}
-                      <span className="absolute bottom-0 inset-x-0 px-1.5 py-1 bg-black/30 backdrop-blur-[2px] flex items-center justify-center">
-                        <span className="text-[8px] font-mono text-white/90 truncate leading-none">
-                          {displayValue}
-                        </span>
-                      </span>
-
                       {/* Copy overlay */}
                       <span
                         className={cn(
@@ -156,7 +149,7 @@ export function ColorView({ lang }: ColorViewProps) {
                       </span>
                     </button>
 
-                    {/* Name + variable */}
+                    {/* Name + variable + value */}
                     <div className="w-24">
                       <p
                         className={cn(
@@ -173,6 +166,14 @@ export function ColorView({ lang }: ColorViewProps) {
                         )}
                       >
                         {swatch.variable}
+                      </p>
+                      <p
+                        className={cn(
+                          "text-[10px] font-mono mt-0.5 truncate",
+                          isDark ? "text-zinc-500" : "text-zinc-500"
+                        )}
+                      >
+                        {displayValue}
                       </p>
                     </div>
                   </div>
