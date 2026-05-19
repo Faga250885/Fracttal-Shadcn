@@ -9,12 +9,15 @@ import { cn } from "@/lib/utils"
 type IconComponent = React.ComponentType<{ size?: number; className?: string }>
 type IconEntry = [string, IconComponent]
 
-// All Lucide icons: PascalCase exports that are React components
+// Lucide exports forwardRef objects {$$typeof, render, displayName}, not plain functions.
+// Filter: is a non-null object, has a "render" property, and does NOT end with "Icon" (avoids duplicates).
 const ALL_ICONS: IconEntry[] = (
   Object.entries(LucideIcons) as [string, unknown][]
-).filter(
-  ([name, val]) => typeof val === "function" && /^[A-Z]/.test(name)
-) as IconEntry[]
+).filter(([name, val]) => {
+  if (name.endsWith("Icon")) return false
+  if (!val || typeof val !== "object") return false
+  return Object.prototype.hasOwnProperty.call(val, "render")
+}) as IconEntry[]
 
 interface IconViewProps {
   lang: Lang
