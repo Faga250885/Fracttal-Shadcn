@@ -8,6 +8,7 @@ import { LeftPanel, type ViewMode } from "./left-panel"
 import { PreviewArea } from "./preview-area"
 import { RightPanel } from "./right-panel"
 import { ColorView } from "./color-view"
+import { IconView } from "./icon-view"
 
 function defaultValues(component: ComponentEntry): Record<string, unknown> {
   return Object.fromEntries(
@@ -56,6 +57,8 @@ export function DSViewer() {
 
       {view === "colors" ? (
         <ColorView lang={lang} />
+      ) : view === "icons" ? (
+        <IconView lang={lang} />
       ) : (
         <>
           <PreviewArea component={selected} propValues={propValues} lang={lang} />

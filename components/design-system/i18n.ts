@@ -4,6 +4,10 @@ export const translations = {
   en: {
     components: "Components",
     colors: "Colors",
+    icons: "Icons",
+    iconsDescription: "Lucide icon set — click any icon to copy its import.",
+    searchIcons: "Search icons…",
+    noIconsFound: "No icons match",
     colorsDescription: "Fracttal brand color tokens — light & dark.",
     controls: "Controls",
     configureHere: "Configure the component here.",
@@ -20,6 +24,10 @@ export const translations = {
   es: {
     components: "Componentes",
     colors: "Colores",
+    icons: "Íconos",
+    iconsDescription: "Set de íconos Lucide — haz clic en uno para copiar su import.",
+    searchIcons: "Buscar íconos…",
+    noIconsFound: "Sin resultados para",
     colorsDescription: "Tokens de color de la marca Fracttal — claro y oscuro.",
     controls: "Controles",
     configureHere: "Configura el componente aquí.",

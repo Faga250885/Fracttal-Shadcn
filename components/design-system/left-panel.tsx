@@ -1,12 +1,12 @@
 "use client"
 
-import { Palette, Layers } from "lucide-react"
+import { Palette, Layers, Shapes } from "lucide-react"
 import { categorizedComponents } from "./registry"
 import { colorGroups } from "./colors"
 import { translations, type Lang } from "./i18n"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export type ViewMode = "components" | "colors"
+export type ViewMode = "components" | "colors" | "icons"
 
 interface LeftPanelProps {
   view: ViewMode
@@ -44,13 +44,17 @@ export function LeftPanel({
       <div className="px-4 pt-4 pb-3 border-b border-zinc-800">
         <Tabs value={view} onValueChange={(v) => onViewChange(v as ViewMode)}>
           <TabsList className="w-full">
-            <TabsTrigger value="components" className="flex-1 gap-1.5 text-[12px]">
+            <TabsTrigger value="components" className="flex-1 gap-1 text-[11px]">
               <Layers className="size-3.5" />
               {t.components}
             </TabsTrigger>
-            <TabsTrigger value="colors" className="flex-1 gap-1.5 text-[12px]">
+            <TabsTrigger value="colors" className="flex-1 gap-1 text-[11px]">
               <Palette className="size-3.5" />
               {t.colors}
+            </TabsTrigger>
+            <TabsTrigger value="icons" className="flex-1 gap-1 text-[11px]">
+              <Shapes className="size-3.5" />
+              {t.icons}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -58,7 +62,14 @@ export function LeftPanel({
 
       {/* Navigation content */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-4">
-        {view === "components" ? (
+        {view === "icons" ? (
+          <div className="flex flex-col items-center justify-center h-full gap-2 text-center px-4">
+            <Shapes className="size-8 text-zinc-700" />
+            <p className="text-[11px] text-zinc-500 leading-relaxed">
+              {t.iconsDescription}
+            </p>
+          </div>
+        ) : view === "components" ? (
           Object.entries(categorizedComponents).map(([category, comps]) => (
             <div key={category}>
               <div className="flex items-center justify-between mb-4">
