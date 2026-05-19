@@ -4,6 +4,9 @@ import React from "react"
 import {
   Loader2, Search, Mail, User, Lock, Bell,
   Tag, Info, AlertCircle,
+  CreditCard, Settings, Users, UserPlus, Plus, LogOut, Trash2,
+  LayoutGrid, Activity, PanelLeft,
+  PanelTop, PanelBottom, PanelRight,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -38,6 +41,14 @@ import {
   AvatarBadge, AvatarGroup, AvatarGroupCount,
 } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+  DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator,
+  DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubTrigger,
+  DropdownMenuSubContent, DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup, DropdownMenuRadioItem,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
 import type { ComponentEntry } from "./types"
 
 export const components: ComponentEntry[] = [
@@ -481,6 +492,397 @@ export default function Example() {
     },
   },
 
+  // ─── DROPDOWN MENU ───────────────────────────────────────────────────────────
+  {
+    id: "dropdown-menu",
+    name: "Dropdown Menu",
+    description: {
+      en: "Displays a menu to the user — triggered by a button — with support for items, groups, submenus, shortcuts, checkboxes, and radio items.",
+      es: "Muestra un menú al usuario — activado por un botón — con soporte para items, grupos, submenús, atajos, checkboxes e items de radio.",
+    },
+    category: "Components",
+    filePath: "components/ui/dropdown-menu.tsx",
+    controls: {
+      trigger:      { type: "text",    defaultValue: "Open menu" },
+      variant:      { type: "select",  options: ["default", "checkboxes", "radio", "submenu"], defaultValue: "default" },
+      side:         { type: "select",  options: ["bottom", "top", "left", "right"], defaultValue: "bottom" },
+      align:        { type: "select",  options: ["start", "center", "end"], defaultValue: "start" },
+      showShortcuts:{ type: "boolean", defaultValue: true },
+      showIcons:    { type: "boolean", defaultValue: false },
+      showLabel:    { type: "boolean", defaultValue: true },
+      destructive:  { type: "boolean", defaultValue: true },
+    },
+    render: (props) => {
+      const { trigger, variant, side, align, showShortcuts, showIcons, showLabel, destructive } = props as {
+        trigger: string; variant: string; side: "bottom"|"top"|"left"|"right"
+        align: "start"|"center"|"end"; showShortcuts: boolean; showIcons: boolean
+        showLabel: boolean; destructive: boolean
+      }
+
+      // Variante checkboxes — extraída como componente para cumplir Rules of Hooks
+      function CheckboxesMenu() {
+        const [showStatus, setShowStatus] = React.useState(true)
+        const [showPanel, setShowPanel]   = React.useState(false)
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">{trigger || "Open menu"}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side={side} align={align} className="w-48">
+              <DropdownMenuGroup>
+                {showLabel && <DropdownMenuLabel>View options</DropdownMenuLabel>}
+                <DropdownMenuCheckboxItem checked={showStatus} onCheckedChange={setShowStatus}>
+                  {showIcons && <LayoutGrid />}
+                  Status bar
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
+                  {showIcons && <Activity />}
+                  Activity panel
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked disabled>
+                  {showIcons && <PanelLeft />}
+                  Sidebar (locked)
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
+
+      // Variante radio — extraída como componente para cumplir Rules of Hooks
+      function RadioMenu() {
+        const [position, setPosition] = React.useState("bottom")
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">{trigger || "Open menu"}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side={side} align={align} className="w-44">
+              <DropdownMenuGroup>
+                {showLabel && <DropdownMenuLabel>Panel position</DropdownMenuLabel>}
+                <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+                  <DropdownMenuRadioItem value="top">
+                    {showIcons && <PanelTop />}
+                    Top
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="bottom">
+                    {showIcons && <PanelBottom />}
+                    Bottom
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="right">
+                    {showIcons && <PanelRight />}
+                    Right
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
+
+      if (variant === "checkboxes") return <CheckboxesMenu />
+      if (variant === "radio") return <RadioMenu />
+
+      if (variant === "submenu") return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">{trigger || "Open menu"}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side={side} align={align} className="w-48">
+              <DropdownMenuGroup>
+                {showLabel && <DropdownMenuLabel>My account</DropdownMenuLabel>}
+                <DropdownMenuItem>
+                  {showIcons && <User />}
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    {showIcons && <Settings />}
+                    More options
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem>
+                      {showIcons && <Settings />}
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      {showIcons && <CreditCard />}
+                      Billing
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      {showIcons && <Users />}
+                      Team
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuGroup>
+              {destructive && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive">
+                    {showIcons && <Trash2 />}
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+
+      // default
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">{trigger || "Open menu"}</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side={side} align={align} className="w-52">
+            <DropdownMenuGroup>
+              {showLabel && <DropdownMenuLabel>My account</DropdownMenuLabel>}
+              <DropdownMenuItem>
+                {showIcons && <User />}
+                Profile
+                {showShortcuts && <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>}
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                {showIcons && <CreditCard />}
+                Billing
+                {showShortcuts && <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>}
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                {showIcons && <Settings />}
+                Settings
+                {showShortcuts && <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                {showIcons && <Users />}
+                Team
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled>
+                {showIcons && <UserPlus />}
+                Invite users
+                {showShortcuts && <DropdownMenuShortcut>⌘I</DropdownMenuShortcut>}
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                {showIcons && <Plus />}
+                New team
+                {showShortcuts && <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            {destructive && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive">
+                  {showIcons && <LogOut />}
+                  Log out
+                  {showShortcuts && <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+    generateCode: (props) => {
+      const { trigger, variant, side, align, showShortcuts, showIcons, showLabel, destructive } = props as {
+        trigger: string; variant: string; side: string; align: string
+        showShortcuts: boolean; showIcons: boolean; showLabel: boolean; destructive: boolean
+      }
+      const contentAttrs = [
+        side !== "bottom" && `side="${side}"`,
+        align !== "start" && `align="${align}"`,
+      ].filter(Boolean).join(" ")
+
+      // helper: icon JSX line (4-space indent inside item)
+      const icon = (name: string) => showIcons ? `\n          <${name} />` : ""
+      // helper: shortcut JSX
+      const sc = (s: string) => showShortcuts ? `\n          <DropdownMenuShortcut>${s}</DropdownMenuShortcut>` : ""
+
+      if (variant === "checkboxes") {
+        const iconImport = showIcons ? `\nimport { LayoutGrid, Activity, PanelLeft } from "lucide-react"` : ""
+        const labelBlock = showLabel
+          ? `\n        <DropdownMenuLabel>View options</DropdownMenuLabel>`
+          : ""
+        return `"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+  DropdownMenuGroup, DropdownMenuLabel, DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu"${iconImport}
+
+export default function Example() {
+  const [showStatus, setShowStatus] = useState(true)
+  const [showPanel, setShowPanel] = useState(false)
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">${trigger || "Open menu"}</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48">
+        <DropdownMenuGroup>${labelBlock}
+          <DropdownMenuCheckboxItem checked={showStatus} onCheckedChange={setShowStatus}>${icon("LayoutGrid")}
+            Status bar
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>${icon("Activity")}
+            Activity panel
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem checked disabled>${icon("PanelLeft")}
+            Sidebar (locked)
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}`
+      }
+
+      if (variant === "radio") {
+        const radioIconImport = showIcons ? `\nimport { PanelTop, PanelBottom, PanelRight } from "lucide-react"` : ""
+        const ri = (name: string) => showIcons ? `\n            <${name} />` : ""
+        return `"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+  DropdownMenuGroup, DropdownMenuLabel,
+  DropdownMenuRadioGroup, DropdownMenuRadioItem,
+} from "@/components/ui/dropdown-menu"${radioIconImport}
+
+export default function Example() {
+  const [position, setPosition] = useState("bottom")
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">${trigger || "Open menu"}</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-44">
+        <DropdownMenuGroup>${showLabel ? `\n          <DropdownMenuLabel>Panel position</DropdownMenuLabel>` : ""}
+          <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+            <DropdownMenuRadioItem value="top">${ri("PanelTop")}
+              Top
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="bottom">${ri("PanelBottom")}
+              Bottom
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="right">${ri("PanelRight")}
+              Right
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}`
+      }
+
+      if (variant === "submenu") {
+        const iconImport = showIcons ? `\nimport { User, Settings, CreditCard, Users, Trash2 } from "lucide-react"` : ""
+        const labelBlock = showLabel ? `\n        <DropdownMenuLabel>My account</DropdownMenuLabel>` : ""
+        const destructiveBlock = destructive
+          ? `\n      <DropdownMenuSeparator />\n      <DropdownMenuItem variant="destructive">${icon("Trash2")}\n        Delete\n      </DropdownMenuItem>`
+          : ""
+        const subImports = ["DropdownMenu", "DropdownMenuTrigger", "DropdownMenuContent",
+          "DropdownMenuGroup", showLabel && "DropdownMenuLabel",
+          "DropdownMenuItem", "DropdownMenuSeparator",
+          "DropdownMenuSub", "DropdownMenuSubTrigger", "DropdownMenuSubContent",
+        ].filter(Boolean).join(", ")
+        return `import { Button } from "@/components/ui/button"
+import {
+  ${subImports}
+} from "@/components/ui/dropdown-menu"${iconImport}
+
+export default function Example() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">${trigger || "Open menu"}</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent${contentAttrs ? ` ${contentAttrs}` : ""} className="w-48">
+        <DropdownMenuGroup>${labelBlock}
+          <DropdownMenuItem>${icon("User")}
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>${icon("Settings")}
+              More options
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem>${icon("Settings")}
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem>${icon("CreditCard")}
+                Billing
+              </DropdownMenuItem>
+              <DropdownMenuItem>${icon("Users")}
+                Team
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>${destructiveBlock}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}`
+      }
+
+      // default variant
+      const iconImport = showIcons ? `\nimport { User, CreditCard, Settings, Users, UserPlus, Plus, LogOut } from "lucide-react"` : ""
+      const labelBlock = showLabel ? `\n        <DropdownMenuLabel>My account</DropdownMenuLabel>` : ""
+      const destructiveBlock = destructive
+        ? `\n      <DropdownMenuSeparator />\n      <DropdownMenuItem variant="destructive">${icon("LogOut")}\n        Log out${sc("⇧⌘Q")}\n      </DropdownMenuItem>`
+        : ""
+      const imports = ["DropdownMenu", "DropdownMenuTrigger", "DropdownMenuContent",
+        "DropdownMenuGroup", showLabel && "DropdownMenuLabel",
+        "DropdownMenuItem", destructive && "DropdownMenuSeparator",
+        showShortcuts && "DropdownMenuShortcut",
+      ].filter(Boolean).join(", ")
+      return `import { Button } from "@/components/ui/button"
+import {
+  ${imports}
+} from "@/components/ui/dropdown-menu"${iconImport}
+
+export default function Example() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">${trigger || "Open menu"}</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent${contentAttrs ? ` ${contentAttrs}` : ""} className="w-52">
+        <DropdownMenuGroup>${labelBlock}
+          <DropdownMenuItem>${icon("User")}
+            Profile${sc("⇧⌘P")}
+          </DropdownMenuItem>
+          <DropdownMenuItem>${icon("CreditCard")}
+            Billing${sc("⌘B")}
+          </DropdownMenuItem>
+          <DropdownMenuItem>${icon("Settings")}
+            Settings${sc("⌘S")}
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>${icon("Users")}
+            Team
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled>${icon("UserPlus")}
+            Invite users${sc("⌘I")}
+          </DropdownMenuItem>
+          <DropdownMenuItem>${icon("Plus")}
+            New team${sc("⌘T")}
+          </DropdownMenuItem>
+        </DropdownMenuGroup>${destructiveBlock}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}`
+    },
+  },
+
   // ─── AVATAR ──────────────────────────────────────────────────────────────────
   {
     id: "avatar",
@@ -776,14 +1178,15 @@ export default function Example() {
     controls: {
       label:       { type: "text",    defaultValue: "Accept terms and conditions" },
       description: { type: "text",    defaultValue: "" },
-      checked:     { type: "boolean", defaultValue: false },
-      disabled:    { type: "boolean", defaultValue: false },
-      invalid:     { type: "boolean", defaultValue: false },
-      group:       { type: "boolean", defaultValue: false },
+      checked:       { type: "boolean", defaultValue: false },
+      indeterminate: { type: "boolean", defaultValue: false },
+      disabled:      { type: "boolean", defaultValue: false },
+      invalid:       { type: "boolean", defaultValue: false },
+      group:         { type: "boolean", defaultValue: false },
     },
     render: (props) => {
-      const { label, description, checked, disabled, invalid, group } = props as {
-        label: string; description: string; checked: boolean
+      const { label, description, checked, indeterminate, disabled, invalid, group } = props as {
+        label: string; description: string; checked: boolean; indeterminate: boolean
         disabled: boolean; invalid: boolean; group: boolean
       }
       if (group) {
@@ -806,8 +1209,9 @@ export default function Example() {
       return (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2">
-            <Checkbox id="cb-demo" key={String(checked)} defaultChecked={checked} disabled={disabled}
-              aria-invalid={invalid ? "true" : undefined} />
+            <Checkbox id="cb-demo" key={String(checked) + String(indeterminate)}
+              defaultChecked={indeterminate ? "indeterminate" : checked}
+              disabled={disabled} aria-invalid={invalid ? "true" : undefined} />
             <label htmlFor="cb-demo" className="text-sm font-medium cursor-pointer leading-none">
               {label || "Accept terms and conditions"}
             </label>
@@ -818,8 +1222,8 @@ export default function Example() {
       )
     },
     generateCode: (props) => {
-      const { label, description, checked, disabled, invalid, group } = props as {
-        label: string; description: string; checked: boolean
+      const { label, description, checked, indeterminate, disabled, invalid, group } = props as {
+        label: string; description: string; checked: boolean; indeterminate: boolean
         disabled: boolean; invalid: boolean; group: boolean
       }
       if (group) {
@@ -836,7 +1240,8 @@ export default function Example() {
         return `import { Checkbox } from "@/components/ui/checkbox"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
       }
       const attrs: string[] = [`id="cb-demo"`]
-      if (checked) attrs.push("defaultChecked")
+      if (indeterminate) attrs.push(`checked="indeterminate"`)
+      else if (checked) attrs.push("defaultChecked")
       if (disabled) attrs.push("disabled")
       if (invalid) attrs.push('aria-invalid="true"')
       const cbTag = `<Checkbox ${attrs.join(" ")} />`

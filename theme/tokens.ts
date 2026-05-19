@@ -38,6 +38,10 @@ export const brandPalette = {
   nearBlack:    "oklch(0.205 0 0)",
   black:        "oklch(0.145 0 0)",
 
+  // ── Marca / Primario ───────────────────────────────────────────────────────
+  blue:         "#2929FF",
+  blueDark:     "#7B7BFF",
+
   // ── Destructivo / Error ────────────────────────────────────────────────────
   red:          "oklch(0.577 0.245 27.325)",
   redDark:      "oklch(0.704 0.191 22.216)",
@@ -69,8 +73,8 @@ export const theme = {
     popover:                 brandPalette.white,
     "popover-foreground":    brandPalette.black,
 
-    primary:                 brandPalette.nearBlack,
-    "primary-foreground":    brandPalette.nearWhite,
+    primary:                 brandPalette.blue,
+    "primary-foreground":    brandPalette.white,
 
     secondary:               brandPalette.gray50,
     "secondary-foreground":  brandPalette.nearBlack,
@@ -86,7 +90,7 @@ export const theme = {
 
     border:                  brandPalette.gray300,
     input:                   brandPalette.gray300,
-    ring:                    brandPalette.gray500,
+    ring:                    brandPalette.blue,
 
     "chart-1":               brandPalette.gray200,
     "chart-2":               brandPalette.gray500,
@@ -96,8 +100,8 @@ export const theme = {
 
     sidebar:                 brandPalette.nearWhite,
     "sidebar-foreground":    brandPalette.black,
-    "sidebar-primary":       brandPalette.nearBlack,
-    "sidebar-primary-foreground": brandPalette.nearWhite,
+    "sidebar-primary":       brandPalette.blue,
+    "sidebar-primary-foreground": brandPalette.white,
     "sidebar-accent":        brandPalette.gray50,
     "sidebar-accent-foreground": brandPalette.nearBlack,
     "sidebar-border":        brandPalette.gray100,
@@ -111,7 +115,7 @@ export const theme = {
     info:                    brandPalette.info,
     "info-foreground":       brandPalette.white,
 
-    radius:                  "0.25rem",
+    radius:                  "0.5rem",
   },
 
   // ── Modo oscuro ────────────────────────────────────────────────────────────
@@ -125,8 +129,8 @@ export const theme = {
     popover:                 brandPalette.nearBlack,
     "popover-foreground":    brandPalette.nearWhite,
 
-    primary:                 brandPalette.gray100,
-    "primary-foreground":    brandPalette.nearBlack,
+    primary:                 brandPalette.blueDark,
+    "primary-foreground":    brandPalette.white,
 
     secondary:               brandPalette.gray800,
     "secondary-foreground":  brandPalette.nearWhite,
@@ -142,7 +146,7 @@ export const theme = {
 
     border:                  "oklch(1 0 0 / 10%)",
     input:                   "oklch(1 0 0 / 15%)",
-    ring:                    brandPalette.gray500,
+    ring:                    brandPalette.blueDark,
 
     "chart-1":               brandPalette.gray200,
     "chart-2":               brandPalette.gray500,
@@ -152,8 +156,8 @@ export const theme = {
 
     sidebar:                 brandPalette.nearBlack,
     "sidebar-foreground":    brandPalette.nearWhite,
-    "sidebar-primary":       "oklch(0.488 0.243 264.376)",
-    "sidebar-primary-foreground": brandPalette.nearWhite,
+    "sidebar-primary":       brandPalette.blueDark,
+    "sidebar-primary-foreground": brandPalette.white,
     "sidebar-accent":        brandPalette.gray800,
     "sidebar-accent-foreground": brandPalette.nearWhite,
     "sidebar-border":        "oklch(1 0 0 / 10%)",
