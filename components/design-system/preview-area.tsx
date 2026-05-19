@@ -58,9 +58,9 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
   const isDark = mode === "dark"
 
   return (
-    <main className="flex-1 min-w-0 flex flex-col border-x border-zinc-200 bg-white overflow-hidden">
+    <main className="flex-1 min-w-0 flex flex-col border-x border-zinc-200 bg-zinc-50 overflow-hidden">
       {/* Component header */}
-      <div className="p-4 shrink-0 h-[74px] flex flex-col justify-center border-b border-zinc-200">
+      <div className="p-4 shrink-0 h-[74px] flex flex-col justify-center border-b border-zinc-200 bg-zinc-50">
         <h1 className="text-base font-semibold text-zinc-800 leading-none">
           {component?.name ?? "—"}
         </h1>
@@ -154,7 +154,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
 
         {/* Code section */}
         {component && (
-          <div className="p-4 bg-white">
+          <div className="p-4">
             <div className="flex items-center gap-4 mb-4">
               <h2 className="text-sm font-semibold text-zinc-800">
                 {t.implementation}
@@ -169,7 +169,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
 
         {/* Examples section */}
         {component?.examples && component.examples.length > 0 && (
-          <div className="p-4 bg-white">
+          <div className="p-4">
             <div className="flex items-center gap-4 mb-4">
               <h2 className="text-sm font-semibold text-zinc-800">Ejemplos</h2>
             </div>
