@@ -56,10 +56,9 @@ function TabsList({
       if (!active) return
       const listRect = list!.getBoundingClientRect()
       const activeRect = active.getBoundingClientRect()
-      const padding = 3 // p-[3px] del TabsList
       setIndicator({
-        left:   activeRect.left   - listRect.left - padding,
-        top:    activeRect.top    - listRect.top  - padding,
+        left:   activeRect.left - listRect.left,
+        top:    activeRect.top  - listRect.top,
         width:  activeRect.width,
         height: activeRect.height,
         ready:  true,
