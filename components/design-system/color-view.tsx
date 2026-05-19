@@ -17,51 +17,43 @@ export function ColorView({ lang }: ColorViewProps) {
   const t = translations[lang]
   const isDark = mode === "dark"
 
-  function handleCopy(label: string) {
-    navigator.clipboard.writeText(label).catch(() => {})
-    setCopied(label)
+  function handleCopy(variable: string) {
+    navigator.clipboard.writeText(`var(${variable})`).catch(() => {})
+    setCopied(variable)
     setTimeout(() => setCopied(null), 1500)
   }
-
-  const pageBg = isDark ? "bg-zinc-950" : "bg-white"
-  const divider  = isDark ? "border-zinc-800" : "border-zinc-100"
-  const groupLabel = isDark ? "text-zinc-600" : "text-zinc-300"
-  const swatchName = isDark ? "text-zinc-300" : "text-zinc-600"
-  const swatchHex  = isDark ? "text-zinc-600" : "text-zinc-400"
 
   return (
     <main
       className={cn(
         "flex-1 min-w-0 flex flex-col border-x border-zinc-200 overflow-hidden transition-colors duration-300",
-        pageBg
+        isDark ? "bg-zinc-950 dark" : "bg-white"
       )}
     >
       {/* Header */}
       <div
         className={cn(
           "px-8 shrink-0 h-[74px] flex items-center justify-between border-b",
-          divider
+          isDark ? "border-zinc-800" : "border-zinc-100"
         )}
       >
         <div>
-          <h1
-            className={cn(
-              "text-base font-semibold leading-none",
-              isDark ? "text-white" : "text-zinc-800"
-            )}
-          >
+          <h1 className={cn("text-base font-semibold leading-none", isDark ? "text-white" : "text-zinc-800")}>
             {t.colors}
           </h1>
-          <p className={cn("text-[12px] mt-0.5", swatchHex)}>
+          <p className={cn("text-[12px] mt-0.5", isDark ? "text-zinc-600" : "text-zinc-400")}>
             {t.colorsDescription}
           </p>
         </div>
 
-        {/* Toggle */}
         <Tabs value={mode} onValueChange={(v) => setMode(v as "light" | "dark")}>
           <TabsList className="h-7 p-0.5">
-            <TabsTrigger value="light" className="h-6 w-7 px-0" aria-label={t.lightMode}><Sun className="size-3.5" /></TabsTrigger>
-            <TabsTrigger value="dark" className="h-6 w-7 px-0" aria-label={t.darkMode}><Moon className="size-3.5" /></TabsTrigger>
+            <TabsTrigger value="light" className="h-6 w-7 px-0" aria-label={t.lightMode}>
+              <Sun className="size-3.5" />
+            </TabsTrigger>
+            <TabsTrigger value="dark" className="h-6 w-7 px-0" aria-label={t.darkMode}>
+              <Moon className="size-3.5" />
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -73,15 +65,15 @@ export function ColorView({ lang }: ColorViewProps) {
             key={group.id}
             className={cn(
               "px-8 py-6 flex gap-8",
-              gi !== 0 && `border-t ${divider}`
+              gi !== 0 && `border-t ${isDark ? "border-zinc-800" : "border-zinc-100"}`
             )}
           >
-            {/* Group label — fixed left column */}
+            {/* Group label */}
             <div className="w-32 shrink-0 pt-1">
               <span
                 className={cn(
                   "text-[10px] font-semibold uppercase tracking-widest",
-                  groupLabel
+                  isDark ? "text-zinc-600" : "text-zinc-300"
                 )}
               >
                 {group.name}
@@ -91,49 +83,32 @@ export function ColorView({ lang }: ColorViewProps) {
             {/* Swatches */}
             <div className="flex flex-wrap gap-x-3 gap-y-5">
               {group.swatches.map((swatch) => {
-                const ci = isDark ? swatch.dark : swatch.light
-                const isCopied = copied === ci.label
-                const isTransparent =
-                  ci.color.startsWith("rgba") ||
-                  ci.color.endsWith("1A") ||
-                  ci.color.endsWith("0A") ||
-                  ci.color.endsWith("1F")
+                const isCopied = copied === swatch.variable
 
                 return (
-                  <div key={swatch.name} className="flex flex-col gap-2">
+                  <div key={swatch.variable} className="flex flex-col gap-2">
                     {/* Chip */}
                     <button
-                      onClick={() => handleCopy(ci.label)}
-                      title={ci.label}
+                      onClick={() => handleCopy(swatch.variable)}
+                      title={`var(${swatch.variable})`}
                       className={cn(
                         "group relative h-9 w-24 rounded-lg transition-all duration-150 cursor-pointer",
                         "hover:scale-[1.04] active:scale-[0.97]",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
                         isDark
                           ? "ring-offset-zinc-950 focus-visible:ring-zinc-500"
-                          : "ring-offset-white focus-visible:ring-zinc-300"
+                          : "ring-offset-white focus-visible:ring-zinc-300",
+                        "border",
+                        isDark ? "border-white/10" : "border-black/5"
                       )}
-                      style={{
-                        backgroundColor: ci.color,
-                        ...(isTransparent
-                          ? {
-                              backgroundImage:
-                                "linear-gradient(45deg,#d4d4d4 25%,transparent 25%),linear-gradient(-45deg,#d4d4d4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d4d4d4 75%),linear-gradient(-45deg,transparent 75%,#d4d4d4 75%)",
-                              backgroundSize: "6px 6px",
-                              backgroundPosition:
-                                "0 0,0 3px,3px -3px,-3px 0px",
-                            }
-                          : {}),
-                      }}
+                      style={{ backgroundColor: `var(${swatch.variable})` }}
                     >
                       {/* Copy overlay */}
                       <span
                         className={cn(
                           "absolute inset-0 rounded-lg flex items-center justify-center transition-all duration-150",
                           "bg-black/20 backdrop-blur-[1px]",
-                          isCopied
-                            ? "opacity-100"
-                            : "opacity-0 group-hover:opacity-100"
+                          isCopied ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                         )}
                       >
                         <Check
@@ -145,12 +120,12 @@ export function ColorView({ lang }: ColorViewProps) {
                       </span>
                     </button>
 
-                    {/* Name + hex */}
+                    {/* Name + variable */}
                     <div className="w-24">
                       <p
                         className={cn(
                           "text-[11px] font-medium leading-tight truncate",
-                          swatchName
+                          isDark ? "text-zinc-300" : "text-zinc-600"
                         )}
                       >
                         {swatch.name}
@@ -158,10 +133,10 @@ export function ColorView({ lang }: ColorViewProps) {
                       <p
                         className={cn(
                           "text-[10px] font-mono mt-0.5 truncate",
-                          swatchHex
+                          isDark ? "text-zinc-600" : "text-zinc-400"
                         )}
                       >
-                        {ci.label}
+                        {swatch.variable}
                       </p>
                     </div>
                   </div>
