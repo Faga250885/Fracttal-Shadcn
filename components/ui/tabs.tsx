@@ -38,16 +38,70 @@ const tabsListVariants = cva(
 function TabsList({
   className,
   variant = "default",
+  children,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
+  const listRef = React.useRef<HTMLDivElement>(null)
+  const [indicator, setIndicator] = React.useState({
+    left: 0, top: 0, width: 0, height: 0, ready: false,
+  })
+
+  React.useLayoutEffect(() => {
+    const list = listRef.current
+    if (!list || variant !== "default") return
+
+    function update() {
+      const active = list!.querySelector('[data-state="active"]') as HTMLElement | null
+      if (!active) return
+      const listRect = list!.getBoundingClientRect()
+      const activeRect = active.getBoundingClientRect()
+      const padding = 3 // p-[3px] del TabsList
+      setIndicator({
+        left:   activeRect.left   - listRect.left - padding,
+        top:    activeRect.top    - listRect.top  - padding,
+        width:  activeRect.width,
+        height: activeRect.height,
+        ready:  true,
+      })
+    }
+
+    update()
+
+    // Observa cambios en data-state de los triggers
+    const mo = new MutationObserver(update)
+    mo.observe(list, { attributes: true, subtree: true, attributeFilter: ["data-state"] })
+
+    // Recalcula si el contenedor cambia de tamaño
+    const ro = new ResizeObserver(update)
+    ro.observe(list)
+
+    return () => { mo.disconnect(); ro.disconnect() }
+  }, [variant])
+
   return (
     <TabsPrimitive.List
+      ref={listRef}
       data-slot="tabs-list"
       data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
+      className={cn(tabsListVariants({ variant }), "relative", className)}
       {...props}
-    />
+    >
+      {/* Indicador deslizante — solo en variante default */}
+      {variant === "default" && indicator.ready && (
+        <span
+          aria-hidden
+          className="absolute rounded-md bg-background shadow-sm pointer-events-none transition-[left,top,width,height] duration-200 ease-out dark:border dark:border-input dark:bg-input/30"
+          style={{
+            left:   indicator.left,
+            top:    indicator.top,
+            width:  indicator.width,
+            height: indicator.height,
+          }}
+        />
+      )}
+      {children}
+    </TabsPrimitive.List>
   )
 }
 
@@ -59,16 +113,13 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap transition-all",
+        "relative z-10 inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap transition-colors",
         "text-foreground/60 hover:text-foreground",
         "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
         "group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start",
-        // default variant active
-        "group-data-[variant=default]/tabs-list:data-[state=active]:bg-background group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm",
         "data-[state=active]:text-foreground",
         "dark:text-muted-foreground dark:hover:text-foreground dark:data-[state=active]:text-foreground",
-        "dark:group-data-[variant=default]/tabs-list:data-[state=active]:border-input dark:group-data-[variant=default]/tabs-list:data-[state=active]:bg-input/30",
         // line variant indicator
         "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity",
         "group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5",
