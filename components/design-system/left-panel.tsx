@@ -104,9 +104,14 @@ export function LeftPanel({
         ) : (
           /* Colors section — groups listed as reference */
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 mb-4">
-              {t.colors}
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                {t.colors}
+              </p>
+              <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded-full">
+                {colorGroups.reduce((acc, g) => acc + g.swatches.length, 0)}
+              </span>
+            </div>
             <ul className="space-y-0.5">
               {colorGroups.map((group) => (
                 <li key={group.id}>
