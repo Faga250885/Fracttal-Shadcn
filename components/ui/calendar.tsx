@@ -97,7 +97,7 @@ function Calendar({
         month_grid: "w-full border-collapse",
         weekdays: cn("flex", defaultClassNames.weekdays, "gap-0"),
         weekday: cn(
-          "text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal",
+          "text-muted-foreground flex-1 h-[--cell-size] select-none rounded-md text-[0.8rem] font-normal flex items-center justify-center",
           defaultClassNames.weekday
         ),
         week: cn("mt-2 flex w-full", defaultClassNames.week, "gap-0"),
