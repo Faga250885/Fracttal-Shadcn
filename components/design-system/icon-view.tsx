@@ -1,25 +1,17 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import * as LucideIcons from "lucide-react"
 import { Search, X, Copy, Download, Check } from "lucide-react"
 import { renderToStaticMarkup } from "react-dom/server"
+import { ALL_ICONS, ICONS_BY_CATEGORY, getIconCategory, type IconComponent } from "./icon-categories"
 import { translations, type Lang } from "./i18n"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-type IconComponent = React.ComponentType<{ size?: number; className?: string }>
-type IconEntry = [string, IconComponent]
-
-// Lucide exports forwardRef objects {$$typeof, render, displayName}, not plain functions.
-// Filter: is a non-null object, has a "render" property, and does NOT end with "Icon" (avoids duplicates).
-const ALL_ICONS: IconEntry[] = (
-  Object.entries(LucideIcons) as [string, unknown][]
-).filter(([name, val]) => {
-  if (name.endsWith("Icon")) return false
-  if (!val || typeof val !== "object") return false
-  return Object.prototype.hasOwnProperty.call(val, "render")
-}) as IconEntry[]
+interface IconViewProps {
+  lang: Lang
+  selectedCategory: string | null
+}
 
 function downloadIconSVG(name: string, Icon: IconComponent) {
   const svg = renderToStaticMarkup(
@@ -34,20 +26,21 @@ function downloadIconSVG(name: string, Icon: IconComponent) {
   URL.revokeObjectURL(url)
 }
 
-interface IconViewProps {
-  lang: Lang
-}
-
-export function IconView({ lang }: IconViewProps) {
+export function IconView({ lang, selectedCategory }: IconViewProps) {
   const [query, setQuery] = useState("")
   const [copied, setCopied] = useState<string | null>(null)
   const t = translations[lang]
 
+  const baseIcons = useMemo(
+    () => (selectedCategory ? (ICONS_BY_CATEGORY[selectedCategory] ?? []) : ALL_ICONS),
+    [selectedCategory]
+  )
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase().replace(/\s+/g, "")
-    if (!q) return ALL_ICONS
-    return ALL_ICONS.filter(([name]) => name.toLowerCase().includes(q))
-  }, [query])
+    if (!q) return baseIcons
+    return baseIcons.filter(([name]) => name.toLowerCase().includes(q))
+  }, [baseIcons, query])
 
   function handleCopy(name: string) {
     navigator.clipboard
@@ -68,7 +61,7 @@ export function IconView({ lang }: IconViewProps) {
           <p className="text-[13px] text-zinc-400 mt-0.5">
             {filtered.length === ALL_ICONS.length
               ? `${ALL_ICONS.length} icons`
-              : `${filtered.length} of ${ALL_ICONS.length}`}
+              : `${filtered.length} of ${baseIcons.length}`}
           </p>
         </div>
 
@@ -115,20 +108,16 @@ export function IconView({ lang }: IconViewProps) {
                     isCopied && "bg-zinc-100"
                   )}
                 >
-                  {/* Icon */}
                   <Icon
                     size={24}
                     className="text-zinc-500 group-hover:text-zinc-800 transition-colors duration-100"
                   />
 
-                  {/* Bottom slot — fixed height, name and actions occupy the same space */}
+                  {/* Bottom slot — fixed height so the tile never grows */}
                   <div className="relative h-4 w-full">
-                    {/* Name */}
                     <span className="absolute inset-0 flex items-center justify-center truncate text-[10px] leading-tight text-zinc-400 transition-opacity duration-100 group-hover:opacity-0">
                       {name}
                     </span>
-
-                    {/* Actions */}
                     <div className="absolute inset-0 flex items-center justify-center gap-1 opacity-0 transition-opacity duration-100 group-hover:opacity-100">
                       <button
                         onClick={() => handleCopy(name)}

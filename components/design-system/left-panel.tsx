@@ -3,6 +3,7 @@
 import { Palette, Layers, Shapes } from "lucide-react"
 import { categorizedComponents } from "./registry"
 import { colorGroups } from "./colors"
+import { CATEGORY_COUNTS } from "./icon-categories"
 import { translations, type Lang } from "./i18n"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -15,6 +16,8 @@ interface LeftPanelProps {
   onSelect: (id: string) => void
   lang: Lang
   onLangChange: (lang: Lang) => void
+  selectedIconCategory: string | null
+  onIconCategorySelect: (id: string | null) => void
 }
 
 export function LeftPanel({
@@ -24,8 +27,11 @@ export function LeftPanel({
   onSelect,
   lang,
   onLangChange,
+  selectedIconCategory,
+  onIconCategorySelect,
 }: LeftPanelProps) {
   const t = translations[lang]
+  const totalIcons = CATEGORY_COUNTS.reduce((acc, c) => acc + c.count, 0)
 
   return (
     <aside className="dark w-[307px] shrink-0 flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
@@ -40,7 +46,7 @@ export function LeftPanel({
         </div>
       </div>
 
-      {/* View toggle — Components / Colors */}
+      {/* View toggle — Components / Colors / Icons */}
       <div className="px-4 pt-4 pb-3 border-b border-zinc-800">
         <Tabs value={view} onValueChange={(v) => onViewChange(v as ViewMode)}>
           <TabsList className="w-full">
@@ -63,11 +69,62 @@ export function LeftPanel({
       {/* Navigation content */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-4">
         {view === "icons" ? (
-          <div className="flex flex-col items-center justify-center h-full gap-2 text-center px-4">
-            <Shapes className="size-8 text-zinc-700" />
-            <p className="text-[11px] text-zinc-500 leading-relaxed">
-              {t.iconsDescription}
-            </p>
+          <div>
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                {t.icons}
+              </p>
+              <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-800 px-1.5 py-0.5 rounded-full">
+                {totalIcons}
+              </span>
+            </div>
+
+            {/* "All" option */}
+            <ul className="space-y-0.5">
+              <li>
+                <button
+                  onClick={() => onIconCategorySelect(null)}
+                  className={[
+                    "w-full flex items-center justify-between px-4 py-1.5 rounded-md text-sm transition-colors cursor-pointer",
+                    selectedIconCategory === null
+                      ? "bg-blue-600 text-white font-medium"
+                      : "text-zinc-400 hover:bg-[rgba(146,187,255,0.1)] hover:text-zinc-100",
+                  ].join(" ")}
+                >
+                  <span>All</span>
+                  <span className={[
+                    "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
+                    selectedIconCategory === null ? "bg-white/20 text-white" : "bg-zinc-800 text-zinc-500",
+                  ].join(" ")}>
+                    {totalIcons}
+                  </span>
+                </button>
+              </li>
+
+              {/* Category rows */}
+              {CATEGORY_COUNTS.map(({ id, label, count }) => (
+                <li key={id}>
+                  <button
+                    onClick={() => onIconCategorySelect(id)}
+                    className={[
+                      "w-full flex items-center justify-between px-4 py-1.5 rounded-md text-sm transition-colors cursor-pointer",
+                      selectedIconCategory === id
+                        ? "bg-blue-600 text-white font-medium"
+                        : "text-zinc-400 hover:bg-[rgba(146,187,255,0.1)] hover:text-zinc-100",
+                    ].join(" ")}
+                  >
+                    <span>{label}</span>
+                    <span className={[
+                      "text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0",
+                      selectedIconCategory === id ? "bg-white/20 text-white" : "bg-zinc-800 text-zinc-500",
+                    ].join(" ")}>
+                      {count}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         ) : view === "components" ? (
           Object.entries(categorizedComponents).map(([category, comps]) => (
@@ -100,7 +157,7 @@ export function LeftPanel({
             </div>
           ))
         ) : (
-          /* Colors section — groups listed as reference */
+          /* Colors section */
           <div>
             <div className="flex items-center justify-between mb-4">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">

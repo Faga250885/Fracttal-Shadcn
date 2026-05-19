@@ -27,6 +27,7 @@ export function DSViewer() {
     initial ? defaultValues(initial) : {}
   )
   const [lang, setLang] = useState<Lang>("en")
+  const [iconCategory, setIconCategory] = useState<string | null>(null)
 
   const selected = components.find((c) => c.id === selectedId)
 
@@ -44,21 +45,28 @@ export function DSViewer() {
     })
   }
 
+  function handleViewChange(v: ViewMode) {
+    setView(v)
+    if (v !== "icons") setIconCategory(null)
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-zinc-950">
       <LeftPanel
         view={view}
-        onViewChange={setView}
+        onViewChange={handleViewChange}
         selectedId={selectedId}
         onSelect={handleSelect}
         lang={lang}
         onLangChange={setLang}
+        selectedIconCategory={iconCategory}
+        onIconCategorySelect={setIconCategory}
       />
 
       {view === "colors" ? (
         <ColorView lang={lang} />
       ) : view === "icons" ? (
-        <IconView lang={lang} />
+        <IconView lang={lang} selectedCategory={iconCategory} />
       ) : (
         <>
           <PreviewArea component={selected} propValues={propValues} lang={lang} />
