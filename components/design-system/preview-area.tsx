@@ -22,21 +22,30 @@ const SKIP_KEYS = new Set([
   "tab1", "tab2", "tab3", "tab4", "fallback",
 ])
 
-function buildSummary(component: ComponentEntry, propValues: Record<string, unknown>): string[] {
-  const tags: string[] = []
+function formatLabel(key: string): string {
+  return key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^(.)/, (s) => s.toUpperCase())
+    .trim()
+}
+
+function buildSummary(
+  component: ComponentEntry,
+  propValues: Record<string, unknown>
+): { label: string; value: string }[] {
+  const tags: { label: string; value: string }[] = []
 
   for (const [key, control] of Object.entries(component.controls)) {
     if (SKIP_KEYS.has(key)) continue
     const value = propValues[key] ?? control.defaultValue
+    const label = formatLabel(key)
 
     if (control.type === "select") {
-      tags.push(String(value))
+      tags.push({ label, value: String(value) })
     } else if (control.type === "boolean") {
-      // Toggles "show*" / "with*" solo se muestran cuando están activos
-      if (value === true) tags.push(key)
+      if (value === true) tags.push({ label, value: "on" })
     } else if (control.type === "number") {
-      // Solo mostrar si difiere del default
-      if (value !== control.defaultValue) tags.push(`${key}: ${value}`)
+      if (value !== control.defaultValue) tags.push({ label, value: String(value) })
     }
   }
 
@@ -85,17 +94,19 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
             {/* Summary chips — top left */}
             {component && (
               <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[55%]">
-                {buildSummary(component, propValues).map((tag) => (
+                {buildSummary(component, propValues).map(({ label, value }) => (
                   <span
-                    key={tag}
+                    key={label}
                     className={[
-                      "text-[10px] font-medium px-1.5 py-0.5 rounded-md leading-none",
+                      "text-[10px] px-1.5 py-0.5 rounded-md leading-none flex items-center gap-1",
                       isDark
                         ? "bg-white/10 text-white/50"
                         : "bg-black/5 text-zinc-400",
                     ].join(" ")}
                   >
-                    {tag}
+                    <span className="font-medium">{label}</span>
+                    <span className={isDark ? "text-white/30" : "text-zinc-300"}>·</span>
+                    <span>{value}</span>
                   </span>
                 ))}
               </div>
