@@ -40,7 +40,7 @@ export function LeftPanel({
         <div className="flex items-center gap-2">
           <img src="/isotipo.svg" alt="Fracttal" className="size-[42px]" />
           <div className="leading-none">
-            <p className="text-base font-semibold text-white">Helix</p>
+            <p className="text-base font-semibold text-white">Julia</p>
             <p className="text-[13px] text-zinc-500 mt-0.5">Fracttal Design System</p>
           </div>
         </div>
