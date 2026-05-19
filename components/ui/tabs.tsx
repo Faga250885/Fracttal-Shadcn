@@ -54,11 +54,14 @@ function TabsList({
     function update() {
       const active = list!.querySelector('[data-state="active"]') as HTMLElement | null
       if (!active) return
+      const style = getComputedStyle(list!)
+      const pt = parseFloat(style.paddingTop)
+      const pb = parseFloat(style.paddingBottom)
       setIndicator({
         left:   active.offsetLeft,
-        top:    active.offsetTop,
+        top:    pt,
         width:  active.offsetWidth,
-        height: active.offsetHeight,
+        height: list!.offsetHeight - pt - pb,
         ready:  true,
       })
     }
