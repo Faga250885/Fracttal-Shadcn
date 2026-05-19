@@ -414,7 +414,7 @@ export default function Example() {
       children:  { type: "text",    defaultValue: "Button" },
       variant:   { type: "select",  options: ["default","destructive","outline","secondary","ghost","link"], defaultValue: "default" },
       size:      { type: "select",  options: ["default","xs","sm","lg","icon","icon-xs","icon-sm","icon-lg"], defaultValue: "default" },
-      icon:      { type: "select",  options: ["none","start","end"], defaultValue: "none" },
+      icon:      { type: "select",  options: ["none","start","end","both"], defaultValue: "none" },
       loading:   { type: "boolean", defaultValue: false },
       disabled:  { type: "boolean", defaultValue: false },
       invalid:   { type: "boolean", defaultValue: false },
@@ -434,6 +434,8 @@ export default function Example() {
         content = <><Mail data-icon="inline-start" />{children || "Button"}</>
       } else if (icon === "end") {
         content = <>{children || "Button"}<Mail data-icon="inline-end" /></>
+      } else if (icon === "both") {
+        content = <><Mail data-icon="inline-start" />{children || "Button"}<Mail data-icon="inline-end" /></>
       } else {
         content = <>{children || "Button"}</>
       }
@@ -451,7 +453,7 @@ export default function Example() {
       }
       const isIconSize = size.startsWith("icon")
       const needsLoader = loading
-      const needsMail = (isIconSize || icon === "start" || icon === "end") && !loading
+      const needsMail = (isIconSize || icon === "start" || icon === "end" || icon === "both") && !loading
 
       let inner: string
       if (loading) {
@@ -462,6 +464,8 @@ export default function Example() {
         inner = `\n  <Mail data-icon="inline-start" />\n  ${children || "Button"}\n`
       } else if (icon === "end") {
         inner = `\n  ${children || "Button"}\n  <Mail data-icon="inline-end" />\n`
+      } else if (icon === "both") {
+        inner = `\n  <Mail data-icon="inline-start" />\n  ${children || "Button"}\n  <Mail data-icon="inline-end" />\n`
       } else {
         inner = children || "Button"
       }
