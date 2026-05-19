@@ -15,6 +15,34 @@ interface PreviewAreaProps {
 
 type Mode = "light" | "dark"
 
+// Controles que no aportan al resumen (son contenido, no configuración)
+const SKIP_KEYS = new Set([
+  "children", "label", "placeholder", "description", "trigger", "content",
+  "title", "triggerLabel", "actionLabel", "cancelLabel",
+  "tab1", "tab2", "tab3", "tab4", "fallback",
+])
+
+function buildSummary(component: ComponentEntry, propValues: Record<string, unknown>): string[] {
+  const tags: string[] = []
+
+  for (const [key, control] of Object.entries(component.controls)) {
+    if (SKIP_KEYS.has(key)) continue
+    const value = propValues[key] ?? control.defaultValue
+
+    if (control.type === "select") {
+      tags.push(String(value))
+    } else if (control.type === "boolean") {
+      // Toggles "show*" / "with*" solo se muestran cuando están activos
+      if (value === true) tags.push(key)
+    } else if (control.type === "number") {
+      // Solo mostrar si difiere del default
+      if (value !== control.defaultValue) tags.push(`${key}: ${value}`)
+    }
+  }
+
+  return tags
+}
+
 export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
   const [mode, setMode] = useState<Mode>("light")
   const t = translations[lang]
@@ -54,6 +82,25 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
               isDark ? "bg-zinc-900 dark text-foreground border border-transparent" : "bg-white text-foreground border border-zinc-100",
             ].join(" ")}
           >
+            {/* Summary chips — top left */}
+            {component && (
+              <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[55%]">
+                {buildSummary(component, propValues).map((tag) => (
+                  <span
+                    key={tag}
+                    className={[
+                      "text-[10px] font-medium px-1.5 py-0.5 rounded-md leading-none",
+                      isDark
+                        ? "bg-white/10 text-white/50"
+                        : "bg-black/5 text-zinc-400",
+                    ].join(" ")}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {/* Light / Dark toggle */}
             <div className="absolute top-3 right-3">
               <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
