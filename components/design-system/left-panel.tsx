@@ -2,6 +2,7 @@
 
 import { Palette, Layers } from "lucide-react"
 import { categorizedComponents } from "./registry"
+import { colorGroups } from "./colors"
 import { translations, type Lang } from "./i18n"
 
 export type ViewMode = "components" | "colors"
@@ -107,24 +108,11 @@ export function LeftPanel({
               {t.colors}
             </p>
             <ul className="space-y-0.5">
-              {[
-                "Fracttal AI",
-                "Primary",
-                "Secondary",
-                "Text",
-                "Action",
-                "Other",
-                "Error status",
-                "Warning status",
-                "Info status",
-                "Success status",
-                "Content",
-                "Background",
-              ].map((group) => (
-                <li key={group}>
+              {colorGroups.map((group) => (
+                <li key={group.id}>
                   <div className="w-full text-left px-4 py-1.5 rounded-md text-sm text-zinc-500 flex items-center gap-2">
                     <span className="size-2 rounded-full bg-zinc-700 shrink-0" />
-                    {group}
+                    {group.name}
                   </div>
                 </li>
               ))}
