@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import * as LucideIcons from "lucide-react"
-import { Search, Check } from "lucide-react"
+import { Search, Check, X } from "lucide-react"
 import { translations, type Lang } from "./i18n"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -65,8 +65,17 @@ export function IconView({ lang }: IconViewProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.searchIcons}
-            className="pl-8"
+            className={cn("pl-8", query && "pr-8")}
           />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-md p-0.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              aria-label="Clear search"
+            >
+              <X className="size-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
