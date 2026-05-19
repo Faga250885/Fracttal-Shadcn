@@ -4,6 +4,7 @@ import { useState, useMemo } from "react"
 import * as LucideIcons from "lucide-react"
 import { Search, Check } from "lucide-react"
 import { translations, type Lang } from "./i18n"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 type IconComponent = React.ComponentType<{ size?: number; className?: string }>
@@ -58,17 +59,13 @@ export function IconView({ lang }: IconViewProps) {
         </div>
 
         {/* Search input */}
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none" />
-          <input
+        <div className="relative w-56">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+          <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.searchIcons}
-            className={cn(
-              "h-8 w-56 rounded-lg border border-zinc-200 bg-white pl-8 pr-3",
-              "text-sm text-zinc-800 placeholder:text-zinc-400",
-              "outline-none focus:ring-2 focus:ring-zinc-200 transition-shadow"
-            )}
+            className="pl-8"
           />
         </div>
       </div>
