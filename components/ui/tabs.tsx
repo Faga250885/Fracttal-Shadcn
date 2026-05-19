@@ -49,30 +49,53 @@ function TabsList({
 
   React.useLayoutEffect(() => {
     const list = listRef.current
-    if (!list || variant !== "default") return
+    if (!list) return
 
     function update() {
       const active = list!.querySelector('[data-state="active"]') as HTMLElement | null
       if (!active) return
-      const style = getComputedStyle(list!)
-      const pt = parseFloat(style.paddingTop)
-      const pb = parseFloat(style.paddingBottom)
-      setIndicator({
-        left:   active.offsetLeft,
-        top:    pt,
-        width:  active.offsetWidth,
-        height: list!.offsetHeight - pt - pb,
-        ready:  true,
-      })
+
+      if (variant === "default") {
+        const style = getComputedStyle(list!)
+        const pt = parseFloat(style.paddingTop)
+        const pb = parseFloat(style.paddingBottom)
+        setIndicator({
+          left:   active.offsetLeft,
+          top:    pt,
+          width:  active.offsetWidth,
+          height: list!.offsetHeight - pt - pb,
+          ready:  true,
+        })
+      } else if (variant === "line") {
+        // Detecta orientación leyendo el data-orientation del root
+        const root = list!.closest("[data-slot='tabs']") as HTMLElement | null
+        const isVertical = root?.dataset.orientation === "vertical"
+
+        if (isVertical) {
+          setIndicator({
+            left:   active.offsetLeft + active.offsetWidth + 4,
+            top:    active.offsetTop,
+            width:  2,
+            height: active.offsetHeight,
+            ready:  true,
+          })
+        } else {
+          setIndicator({
+            left:   active.offsetLeft,
+            top:    active.offsetTop + active.offsetHeight - 2,
+            width:  active.offsetWidth,
+            height: 2,
+            ready:  true,
+          })
+        }
+      }
     }
 
     update()
 
-    // Observa cambios en data-state de los triggers
     const mo = new MutationObserver(update)
     mo.observe(list, { attributes: true, subtree: true, attributeFilter: ["data-state"] })
 
-    // Recalcula si el contenedor cambia de tamaño
     const ro = new ResizeObserver(update)
     ro.observe(list)
 
@@ -87,7 +110,7 @@ function TabsList({
       className={cn(tabsListVariants({ variant }), "relative", className)}
       {...props}
     >
-      {/* Indicador deslizante — solo en variante default */}
+      {/* Indicador deslizante — variante default */}
       {variant === "default" && indicator.ready && (
         <span
           aria-hidden
@@ -100,6 +123,21 @@ function TabsList({
           }}
         />
       )}
+
+      {/* Indicador deslizante — variante line */}
+      {variant === "line" && indicator.ready && (
+        <span
+          aria-hidden
+          className="absolute bg-foreground pointer-events-none rounded-full transition-[left,top,width,height] duration-200 ease-out"
+          style={{
+            left:   indicator.left,
+            top:    indicator.top,
+            width:  indicator.width,
+            height: indicator.height,
+          }}
+        />
+      )}
+
       {children}
     </TabsPrimitive.List>
   )
@@ -120,11 +158,6 @@ function TabsTrigger({
         "group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start",
         "data-[state=active]:text-foreground",
         "dark:text-muted-foreground dark:hover:text-foreground dark:data-[state=active]:text-foreground",
-        // line variant indicator
-        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity",
-        "group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5",
-        "group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5",
-        "group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",
         className
       )}
       {...props}
