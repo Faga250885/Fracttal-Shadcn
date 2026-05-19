@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import React, { useState, useMemo } from "react"
 import * as LucideIcons from "lucide-react"
-import { Search, Check, X } from "lucide-react"
+import { Search, X, Copy, Download, Check } from "lucide-react"
+import { renderToStaticMarkup } from "react-dom/server"
 import { translations, type Lang } from "./i18n"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -19,6 +20,19 @@ const ALL_ICONS: IconEntry[] = (
   if (!val || typeof val !== "object") return false
   return Object.prototype.hasOwnProperty.call(val, "render")
 }) as IconEntry[]
+
+function downloadIconSVG(name: string, Icon: IconComponent) {
+  const svg = renderToStaticMarkup(
+    React.createElement(Icon as React.ComponentType<object>, { size: 24 })
+  )
+  const blob = new Blob([svg], { type: "image/svg+xml" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `${name}.svg`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 interface IconViewProps {
   lang: Lang
@@ -93,26 +107,49 @@ export function IconView({ lang }: IconViewProps) {
             {filtered.map(([name, Icon]) => {
               const isCopied = copied === name
               return (
-                <button
+                <div
                   key={name}
-                  onClick={() => handleCopy(name)}
-                  title={`${name} — click to copy import`}
                   className={cn(
-                    "group flex flex-col items-center gap-2 rounded-lg px-1 py-3 text-center",
-                    "cursor-pointer transition-colors duration-100",
-                    "hover:bg-zinc-100 active:bg-zinc-200",
+                    "group relative flex flex-col items-center gap-2 rounded-lg px-1 py-3 text-center",
+                    "transition-colors duration-100 hover:bg-zinc-100",
                     isCopied && "bg-zinc-100"
                   )}
                 >
-                  {isCopied ? (
-                    <Check size={24} className="text-zinc-800" />
-                  ) : (
-                    <Icon size={24} className="text-zinc-500 group-hover:text-zinc-800 transition-colors duration-100" />
-                  )}
-                  <span className="w-full truncate text-[10px] leading-tight text-zinc-400 group-hover:text-zinc-600 transition-colors duration-100">
-                    {name}
-                  </span>
-                </button>
+                  {/* Icon */}
+                  <Icon
+                    size={24}
+                    className="text-zinc-500 group-hover:text-zinc-800 transition-colors duration-100"
+                  />
+
+                  {/* Bottom slot — fixed height, name and actions occupy the same space */}
+                  <div className="relative h-4 w-full">
+                    {/* Name */}
+                    <span className="absolute inset-0 flex items-center justify-center truncate text-[10px] leading-tight text-zinc-400 transition-opacity duration-100 group-hover:opacity-0">
+                      {name}
+                    </span>
+
+                    {/* Actions */}
+                    <div className="absolute inset-0 flex items-center justify-center gap-1 opacity-0 transition-opacity duration-100 group-hover:opacity-100">
+                      <button
+                        onClick={() => handleCopy(name)}
+                        title="Copy import"
+                        className="flex items-center justify-center rounded-md p-1 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-800 transition-colors cursor-pointer"
+                      >
+                        {isCopied
+                          ? <Check className="size-3.5 text-zinc-800" />
+                          : <Copy className="size-3.5" />
+                        }
+                      </button>
+                      <button
+                        onClick={() => downloadIconSVG(name, Icon)}
+                        title="Download SVG"
+                        className="flex items-center justify-center rounded-md p-1 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-800 transition-colors cursor-pointer"
+                      >
+                        <Download className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )
             })}
           </div>
