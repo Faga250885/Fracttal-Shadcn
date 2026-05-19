@@ -32,6 +32,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog"
+import { toast } from "sonner"
 import {
   Avatar, AvatarImage, AvatarFallback,
   AvatarBadge, AvatarGroup, AvatarGroupCount,
@@ -278,6 +279,100 @@ export default function Example() {
     </AlertDialog>
   )
 }`
+    },
+  },
+
+  // ─── SONNER ──────────────────────────────────────────────────────────────────
+  {
+    id: "sonner",
+    name: "Sonner",
+    description: {
+      en: "A toast notification system — stack, dismiss, and style messages with ease.",
+      es: "Sistema de notificaciones toast — apila, descarta y estiliza mensajes fácilmente.",
+    },
+    category: "Components",
+    filePath: "components/ui/sonner.tsx",
+    controls: {
+      type:        { type: "select",  options: ["default", "success", "error", "warning", "info", "loading", "promise"], defaultValue: "default" },
+      message:     { type: "text",    defaultValue: "Your changes have been saved." },
+      description: { type: "text",    defaultValue: "" },
+      position:    { type: "select",  options: ["top-left","top-center","top-right","bottom-left","bottom-center","bottom-right"], defaultValue: "bottom-right" },
+      duration:    { type: "select",  options: ["2000","4000","8000","Infinity"], defaultValue: "4000" },
+    },
+    render: (props) => {
+      const { type, message, description, position, duration } = props as {
+        type: string; message: string; description: string
+        position: "top-left"|"top-center"|"top-right"|"bottom-left"|"bottom-center"|"bottom-right"
+        duration: string
+      }
+      const msg = message || "Your changes have been saved."
+      const opts = {
+        description: description || undefined,
+        position,
+        duration: duration === "Infinity" ? Infinity : Number(duration),
+      }
+
+      function fire() {
+        if (type === "success")  toast.success(msg, opts)
+        else if (type === "error")   toast.error(msg, opts)
+        else if (type === "warning") toast.warning(msg, opts)
+        else if (type === "info")    toast.info(msg, opts)
+        else if (type === "loading") toast.loading(msg, opts)
+        else if (type === "promise") {
+          toast.promise(
+            new Promise<string>((res) => setTimeout(() => res("Done!"), 2000)),
+            { loading: "Loading...", success: msg, error: "Something went wrong.", position, }
+          )
+        } else toast(msg, opts)
+      }
+
+      return (
+        <div className="flex flex-col items-center gap-3">
+          <Button onClick={fire} variant="outline">
+            Show toast
+          </Button>
+          <p className="text-[11px] text-muted-foreground">
+            Type: <span className="font-medium text-foreground">{type}</span>
+          </p>
+        </div>
+      )
+    },
+    generateCode: (props) => {
+      const { type, message, description, position, duration } = props as {
+        type: string; message: string; description: string; position: string; duration: string
+      }
+      const msg = message || "Your changes have been saved."
+      const optsLines: string[] = []
+      if (description) optsLines.push(`  description: "${description}",`)
+      if (position !== "bottom-right") optsLines.push(`  position: "${position}",`)
+      if (duration !== "4000") optsLines.push(`  duration: ${duration === "Infinity" ? "Infinity" : duration},`)
+      const opts = optsLines.length ? `{\n${optsLines.join("\n")}\n}` : ""
+
+      let toastCall = ""
+      if (type === "promise") {
+        toastCall = `toast.promise(\n  fetchData(),\n  { loading: "Loading...", success: "${msg}", error: "Error." }\n)`
+      } else {
+        const fn = type === "default" ? "toast" : `toast.${type}`
+        toastCall = opts ? `${fn}("${msg}", ${opts})` : `${fn}("${msg}")`
+      }
+
+      return `import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+
+export default function Example() {
+  return (
+    <Button
+      variant="outline"
+      onClick={() => ${toastCall}}
+    >
+      Show toast
+    </Button>
+  )
+}
+
+// Mount <Toaster /> once in your root layout:
+// import { Toaster } from "@/components/ui/sonner"
+// <Toaster richColors position="bottom-right" />`
     },
   },
 
