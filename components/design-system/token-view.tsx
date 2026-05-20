@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { theme } from "@/theme/tokens"
 import { type Lang } from "./i18n"
 import { cn } from "@/lib/utils"
@@ -314,7 +314,7 @@ export function TokenView({
 
             <div className="flex flex-col gap-3">
               {TYPOGRAPHY_STYLES.map((style) => {
-                const El = style.el as keyof JSX.IntrinsicElements
+                const El = style.el as keyof React.JSX.IntrinsicElements
                 return (
                   <div key={style.name} className="px-4 py-4 rounded-md border border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <div className="flex items-center gap-2 mb-3">
