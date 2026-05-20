@@ -2,6 +2,8 @@ export type Lang = "en" | "es"
 
 export const translations = {
   en: {
+    inicio: "Inicio",
+    tokens: "Tokens",
     components: "Components",
     colors: "Colors",
     icons: "Icons",
@@ -22,6 +24,8 @@ export const translations = {
     darkMode: "Dark",
   },
   es: {
+    inicio: "Inicio",
+    tokens: "Tokens",
     components: "Componentes",
     colors: "Colores",
     icons: "Íconos",

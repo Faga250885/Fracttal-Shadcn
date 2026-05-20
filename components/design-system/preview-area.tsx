@@ -61,10 +61,10 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
     <main className="flex-1 min-w-0 flex flex-col border-x border-zinc-200 bg-zinc-50 overflow-hidden">
       {/* Component header */}
       <div className="p-4 shrink-0 h-[74px] flex flex-col justify-center border-b border-zinc-200 bg-zinc-50">
-        <h1 className="text-base font-semibold text-zinc-800 leading-none">
+        <h1 className="text-base font-semibold tracking-tight leading-none">
           {component?.name ?? "—"}
         </h1>
-        <p className="text-[13px] text-zinc-400 mt-0.5">
+        <p className="text-sm text-muted-foreground mt-0.5">
           {component?.description[lang]}
         </p>
       </div>
@@ -76,7 +76,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
         <div className="px-4 pt-4">
           {/* Title row — above the canvas */}
           <div className="flex items-center gap-4 mb-4">
-            <h2 className="text-sm font-semibold text-zinc-800">{t.preview}</h2>
+            <h2 className="text-sm font-semibold tracking-tight">{t.preview}</h2>
             {component && (
               <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
                 {component.filePath}
@@ -145,7 +145,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
             {component ? (
               component.render(propValues)
             ) : (
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-muted-foreground">
                 {t.selectFromLeft}
               </p>
             )}
@@ -156,7 +156,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
         {component && (
           <div className="p-4">
             <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-sm font-semibold text-zinc-800">
+              <h2 className="text-sm font-semibold tracking-tight">
                 {t.implementation}
               </h2>
               <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
@@ -171,7 +171,7 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
         {component?.examples && component.examples.length > 0 && (
           <div className="p-4">
             <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-sm font-semibold text-zinc-800">Ejemplos</h2>
+              <h2 className="text-sm font-semibold tracking-tight">Ejemplos</h2>
             </div>
             <div className="grid grid-cols-2 gap-4">
               {component.examples.map((ex) => (

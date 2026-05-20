@@ -65,10 +65,10 @@ export function ColorView({ lang }: ColorViewProps) {
         )}
       >
         <div>
-          <h1 className={cn("text-base font-semibold leading-none", isDark ? "text-white" : "text-zinc-800")}>
+          <h1 className="text-base font-semibold tracking-tight leading-none">
             {t.colors}
           </h1>
-          <p className={cn("text-[12px] mt-0.5", isDark ? "text-zinc-600" : "text-zinc-400")}>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {t.colorsDescription}
           </p>
         </div>

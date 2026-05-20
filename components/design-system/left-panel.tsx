@@ -3,7 +3,7 @@
 import { useState } from "react"
 import type { LucideIcon } from "lucide-react"
 import {
-  Palette, Layers, Shapes, ChevronDown, PuzzleIcon,
+  Palette, Layers, Shapes, ChevronDown, PuzzleIcon, Home,
   // Component item icons
   ChevronsUpDown, AlertCircle, AlertTriangle, BellRing,
   AppWindow, ChevronDown as ChevronDownIcon, CircleUser, Tag,
@@ -15,15 +15,18 @@ import {
   Clock, Play, MapPin, User, Shield, Code2, Monitor, Leaf, Utensils,
   DollarSign, Wrench, Heart, Building2, BookOpen, Calculator,
   ShoppingBag, Share2, Gamepad2, Sparkles, Box,
+  Pipette, Radius, CaseSensitive,
 } from "lucide-react"
 import { categorizedComponents } from "./registry"
 import { colorGroups, type ColorSwatch } from "./colors"
 import { CATEGORY_COUNTS } from "./icon-categories"
 import { translations, type Lang } from "./i18n"
+import { TOKEN_SECTIONS, type TokenSectionId } from "./token-view"
 import { theme } from "@/theme/tokens"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { cn } from "@/lib/utils"
 
-export type ViewMode = "components" | "colors" | "icons"
+export type ViewMode = "inicio" | "tokens" | "icons"
 
 // ─── Component groups ────────────────────────────────────────────────────────
 
@@ -78,6 +81,14 @@ const COMP_ITEM_ICONS: Record<string, LucideIcon> = {
   tabs:           LayoutDashboard,
   textarea:       AlignLeft,
   tooltip:        Info,
+}
+
+// ─── Token section → icon mapping ────────────────────────────────────────────
+
+const TOKEN_SECTION_ICONS: Record<string, LucideIcon> = {
+  colors:     Pipette,
+  radius:     Radius,
+  typography: CaseSensitive,
 }
 
 // ─── Icon category → icon mapping ────────────────────────────────────────────
@@ -164,6 +175,8 @@ interface LeftPanelProps {
   onIconCategorySelect: (id: string | null) => void
   compositorOpen: boolean
   onCompositorToggle: (open: boolean) => void
+  tokenSection: TokenSectionId | null
+  onTokenSectionSelect: (id: TokenSectionId) => void
 }
 
 // ─── Panel ────────────────────────────────────────────────────────────────────
@@ -179,21 +192,12 @@ export function LeftPanel({
   onIconCategorySelect,
   compositorOpen,
   onCompositorToggle,
+  tokenSection,
+  onTokenSectionSelect,
 }: LeftPanelProps) {
   const t = translations[lang]
   const totalIcons = CATEGORY_COUNTS.reduce((acc, c) => acc + c.count, 0)
-
-  // Top-level section open state (components view)
-  const [openTop, setOpenTop] = useState<Record<string, boolean>>({
-    components: true,
-    composer:   false,
-  })
-  function toggleTop(id: string) {
-    const next = !openTop[id]
-    setOpenTop((prev) => ({ ...prev, [id]: next }))
-    if (id === "composer") onCompositorToggle(next)
-    if (id === "components" && next) onCompositorToggle(false)
-  }
+  const [componentsExpanded, setComponentsExpanded] = useState(true)
 
   // Flat component list indexed by ID for lookup
   const allComps = Object.values(categorizedComponents).flat()
@@ -217,13 +221,13 @@ export function LeftPanel({
       <div className="px-4 pt-4">
         <Tabs value={view} onValueChange={(v) => onViewChange(v as ViewMode)}>
           <TabsList className="w-full">
-            <TabsTrigger value="components" className="flex-1 gap-1 text-[11px]">
-              <Layers className="size-3.5" />
-              {t.components}
+            <TabsTrigger value="inicio" className="flex-1 gap-1 text-[11px]">
+              <Home className="size-3.5" />
+              {t.inicio}
             </TabsTrigger>
-            <TabsTrigger value="colors" className="flex-1 gap-1 text-[11px]">
+            <TabsTrigger value="tokens" className="flex-1 gap-1 text-[11px]">
               <Palette className="size-3.5" />
-              {t.colors}
+              {t.tokens}
             </TabsTrigger>
             <TabsTrigger value="icons" className="flex-1 gap-1 text-[11px]">
               <Shapes className="size-3.5" />
@@ -234,30 +238,30 @@ export function LeftPanel({
       </div>
 
       {/* Navigation content */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+      <nav className="flex-1 overflow-y-auto p-3 flex flex-col gap-1">
 
-        {/* ── Components view ── */}
-        {view === "components" && (
-          <div className="space-y-1">
+        {/* ── Inicio view ── */}
+        {view === "inicio" && (
+          <div className="flex flex-col gap-1">
 
-            {/* Sección: Componentes */}
+            {/* Componentes (expandable) */}
             <div>
               <button
-                onClick={() => toggleTop("components")}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors cursor-pointer hover:bg-zinc-800 group"
+                onClick={() => setComponentsExpanded((v) => !v)}
+                className="group w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors cursor-pointer hover:bg-zinc-800"
               >
                 <Layers className="size-3.5 shrink-0 text-zinc-500 group-hover:text-zinc-300" />
                 <span className="flex-1 text-left text-sm font-medium text-zinc-300 group-hover:text-white">
                   Componentes
                 </span>
-                <ChevronDown className={[
+                <ChevronDown className={cn(
                   "size-3.5 text-zinc-600 shrink-0 transition-transform duration-200",
-                  openTop.components ? "rotate-0" : "-rotate-90",
-                ].join(" ")} />
+                  componentsExpanded ? "rotate-0" : "-rotate-90",
+                )} />
               </button>
 
-              {openTop.components && (
-                <div className="mt-1 space-y-1">
+              {componentsExpanded && (
+                <div className="mt-1 flex flex-col gap-1">
                   {COMP_GROUPS.map((group, i) => {
                     const items = group.ids.map((id) => compById[id]).filter(Boolean)
                     return (
@@ -266,25 +270,26 @@ export function LeftPanel({
                         <p className="px-2 py-1.5 text-[10px] font-medium text-zinc-500">
                           {group.label}
                         </p>
-                        <ul className="space-y-0.5">
+                        <ul className="flex flex-col gap-0.5">
                           {items.map((comp) => {
+                            const isSelected = selectedId === comp.id && !compositorOpen
                             const ItemIcon = COMP_ITEM_ICONS[comp.id]
                             return (
                               <li key={comp.id}>
                                 <button
                                   onClick={() => onSelect(comp.id)}
-                                  className={[
+                                  className={cn(
                                     "w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors cursor-pointer",
-                                    selectedId === comp.id
+                                    isSelected
                                       ? "bg-blue-600 text-white font-medium"
                                       : "text-zinc-400 hover:bg-[rgba(146,187,255,0.1)] hover:text-zinc-100",
-                                  ].join(" ")}
+                                  )}
                                 >
                                   {ItemIcon && (
-                                    <ItemIcon className={[
+                                    <ItemIcon className={cn(
                                       "size-3.5 shrink-0",
-                                      selectedId === comp.id ? "text-white" : "text-zinc-600",
-                                    ].join(" ")} />
+                                      isSelected ? "text-white" : "text-zinc-600",
+                                    )} />
                                   )}
                                   {comp.name}
                                 </button>
@@ -299,39 +304,53 @@ export function LeftPanel({
               )}
             </div>
 
-            {/* Sección: Compositor */}
-            <div>
-              <button
-                onClick={() => toggleTop("composer")}
-                className={[
-                  "w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors cursor-pointer group",
-                  compositorOpen ? "bg-zinc-800" : "hover:bg-zinc-800",
-                ].join(" ")}
-              >
-                <PuzzleIcon className={[
-                  "size-3.5 shrink-0 transition-colors",
-                  compositorOpen ? "text-blue-400" : "text-zinc-500 group-hover:text-zinc-300",
-                ].join(" ")} />
-                <span className={[
-                  "flex-1 text-left text-sm font-medium transition-colors",
-                  compositorOpen ? "text-white" : "text-zinc-300 group-hover:text-white",
-                ].join(" ")}>
-                  Compositor
-                </span>
-                <ChevronDown className={[
-                  "size-3.5 text-zinc-600 shrink-0 transition-transform duration-200",
-                  openTop.composer ? "rotate-0" : "-rotate-90",
-                ].join(" ")} />
-              </button>
-
-              {openTop.composer && (
-                <div className="mt-1 px-2 py-3 text-[12px] text-zinc-600 text-center">
-                  Próximamente
-                </div>
+            {/* Compositor (no expandible) */}
+            <button
+              onClick={() => { onCompositorToggle(true) }}
+              className={cn(
+                "group w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors cursor-pointer",
+                compositorOpen
+                  ? "bg-blue-600 text-white font-medium"
+                  : "text-zinc-400 hover:bg-[rgba(146,187,255,0.1)] hover:text-zinc-100",
               )}
-            </div>
+            >
+              <PuzzleIcon className={cn(
+                "size-3.5 shrink-0",
+                compositorOpen ? "text-white" : "text-zinc-600 group-hover:text-zinc-300",
+              )} />
+              <span className="flex-1">Compositor</span>
+              <span className={cn(
+                "text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0",
+                compositorOpen ? "bg-white/20 text-white" : "bg-blue-500/20 text-blue-400",
+              )}>beta</span>
+            </button>
 
           </div>
+        )}
+
+        {/* ── Tokens view ── */}
+        {view === "tokens" && (
+          <ul className="flex flex-col gap-0.5">
+            {TOKEN_SECTIONS.map(({ id, label }) => {
+              const SectionIcon = TOKEN_SECTION_ICONS[id] ?? Box
+              return (
+                <li key={id}>
+                  <button
+                    onClick={() => onTokenSectionSelect(id)}
+                    className={cn(
+                      "w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors cursor-pointer",
+                      tokenSection === id
+                        ? "bg-blue-600 text-white font-medium"
+                        : "text-zinc-400 hover:bg-[rgba(146,187,255,0.1)] hover:text-zinc-100",
+                    )}
+                  >
+                    <SectionIcon className={cn("size-3.5 shrink-0", tokenSection === id ? "text-white" : "text-zinc-600")} />
+                    <span>{label}</span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
         )}
 
         {/* ── Icons ── */}
@@ -386,20 +405,6 @@ export function LeftPanel({
           </ul>
         )}
 
-        {/* ── Colors ── */}
-        {view === "colors" && colorGroups.map((group, i) => (
-          <div key={group.id}>
-            {i > 0 && <div className="h-px bg-zinc-800 mx-2 my-1" />}
-            <p className="px-2 py-1.5 text-[10px] font-medium text-zinc-500">
-              {group.name}
-            </p>
-            <ul className="space-y-0.5">
-              {group.swatches.map((swatch) => (
-                <ColorItem key={swatch.variable} swatch={swatch} />
-              ))}
-            </ul>
-          </div>
-        ))}
 
       </nav>
 

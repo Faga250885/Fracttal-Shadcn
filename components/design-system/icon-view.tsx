@@ -70,10 +70,10 @@ export function IconView({ lang, selectedCategory }: IconViewProps) {
       {/* Header */}
       <div className="px-8 shrink-0 h-[74px] flex items-center justify-between border-b border-zinc-100">
         <div>
-          <h1 className="text-base font-semibold text-zinc-800 leading-none">
+          <h1 className="text-base font-semibold tracking-tight leading-none">
             {t.icons}
           </h1>
-          <p className="text-[13px] text-zinc-400 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {filtered.length === ALL_ICONS.length
               ? `${ALL_ICONS.length} icons`
               : `${filtered.length} of ${baseIcons.length}`}

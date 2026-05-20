@@ -10,6 +10,7 @@ import { RightPanel } from "./right-panel"
 import { ColorView } from "./color-view"
 import { IconView } from "./icon-view"
 import { CompositorArea } from "./compositor-area"
+import { TokenView, type TokenSectionId } from "./token-view"
 
 function defaultValues(component: ComponentEntry): Record<string, unknown> {
   return Object.fromEntries(
@@ -22,7 +23,7 @@ function defaultValues(component: ComponentEntry): Record<string, unknown> {
 
 export function DSViewer() {
   const initial = components[0]
-  const [view, setView] = useState<ViewMode>("components")
+  const [view, setView] = useState<ViewMode>("inicio")
   const [selectedId, setSelectedId] = useState<string>(initial?.id ?? "")
   const [propValues, setPropValues] = useState<Record<string, unknown>>(
     initial ? defaultValues(initial) : {}
@@ -30,6 +31,7 @@ export function DSViewer() {
   const [lang, setLang] = useState<Lang>("en")
   const [iconCategory, setIconCategory] = useState<string | null>(null)
   const [compositorOpen, setCompositorOpen] = useState(false)
+  const [tokenSection, setTokenSection] = useState<TokenSectionId | null>(null)
 
   const selected = components.find((c) => c.id === selectedId)
 
@@ -65,15 +67,17 @@ export function DSViewer() {
         selectedIconCategory={iconCategory}
         onIconCategorySelect={setIconCategory}
         compositorOpen={compositorOpen}
-        onCompositorToggle={(open) => setCompositorOpen(open)}
+        onCompositorToggle={setCompositorOpen}
+        tokenSection={tokenSection}
+        onTokenSectionSelect={setTokenSection}
       />
 
-      {view === "colors" ? (
-        <ColorView lang={lang} />
-      ) : view === "icons" ? (
+      {view === "icons" ? (
         <IconView lang={lang} selectedCategory={iconCategory} />
+      ) : view === "tokens" ? (
+        <TokenView lang={lang} activeSection={tokenSection} />
       ) : compositorOpen ? (
-        <CompositorArea />
+        <CompositorArea lang={lang} />
       ) : (
         <>
           <PreviewArea component={selected} propValues={propValues} lang={lang} />
