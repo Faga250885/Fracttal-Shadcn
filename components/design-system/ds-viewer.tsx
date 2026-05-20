@@ -9,6 +9,7 @@ import { PreviewArea } from "./preview-area"
 import { RightPanel } from "./right-panel"
 import { ColorView } from "./color-view"
 import { IconView } from "./icon-view"
+import { CompositorArea } from "./compositor-area"
 
 function defaultValues(component: ComponentEntry): Record<string, unknown> {
   return Object.fromEntries(
@@ -28,6 +29,7 @@ export function DSViewer() {
   )
   const [lang, setLang] = useState<Lang>("en")
   const [iconCategory, setIconCategory] = useState<string | null>(null)
+  const [compositorOpen, setCompositorOpen] = useState(false)
 
   const selected = components.find((c) => c.id === selectedId)
 
@@ -36,6 +38,7 @@ export function DSViewer() {
     if (!comp) return
     setSelectedId(id)
     setPropValues(defaultValues(comp))
+    setCompositorOpen(false)
   }
 
   function handleChange(key: string, value: unknown) {
@@ -61,12 +64,16 @@ export function DSViewer() {
         onLangChange={setLang}
         selectedIconCategory={iconCategory}
         onIconCategorySelect={setIconCategory}
+        compositorOpen={compositorOpen}
+        onCompositorToggle={(open) => setCompositorOpen(open)}
       />
 
       {view === "colors" ? (
         <ColorView lang={lang} />
       ) : view === "icons" ? (
         <IconView lang={lang} selectedCategory={iconCategory} />
+      ) : compositorOpen ? (
+        <CompositorArea />
       ) : (
         <>
           <PreviewArea component={selected} propValues={propValues} lang={lang} />
