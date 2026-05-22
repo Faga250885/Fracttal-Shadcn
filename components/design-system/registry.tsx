@@ -7,40 +7,14 @@ import {
   CreditCard, Settings, Users, UserPlus, Plus, LogOut, Trash2,
   LayoutGrid, Activity, PanelLeft,
   PanelTop, PanelBottom, PanelRight,
-  // Button icons
-  ArrowRight, ArrowLeft, ChevronRight, ChevronLeft,
-  X, Check, Download, Upload, Send, Save,
-  Edit, Copy, Eye, ExternalLink, Star,
-  RefreshCw, Filter, Heart, Share2, Link2,
 } from "lucide-react"
 
-// ─── Button icon palette ──────────────────────────────────────────────────────
+// ─── Button icon helper ───────────────────────────────────────────────────────
 
-const BUTTON_ICON_OPTIONS = [
-  "none",
-  "ArrowRight","ArrowLeft","ChevronRight","ChevronLeft",
-  "Plus","X","Check","Download","Upload",
-  "Search","Mail","Send","Save","Edit",
-  "Trash2","Copy","Eye","ExternalLink","Star",
-  "Settings","User","Lock","RefreshCw","Filter",
-  "Heart","Share2","Link2","Bell",
-] as const
-
-type ButtonIconName = (typeof BUTTON_ICON_OPTIONS)[number]
-
-const BUTTON_ICON_MAP: Record<Exclude<ButtonIconName, "none">, React.ComponentType<{ className?: string }>> = {
-  ArrowRight, ArrowLeft, ChevronRight, ChevronLeft,
-  Plus, X, Check, Download, Upload,
-  Search, Mail, Send, Save, Edit,
-  Trash2, Copy, Eye, ExternalLink, Star,
-  Settings, User, Lock, RefreshCw, Filter,
-  Heart, Share2, Link2, Bell,
-}
-
-function ButtonIcon({ name, ...props }: { name: ButtonIconName; className?: string }) {
-  if (name === "none") return null
-  const Icon = BUTTON_ICON_MAP[name]
-  return Icon ? <Icon {...props} /> : null
+function ButtonIcon({ name, className }: { name: string; className?: string }) {
+  if (!name || name === "none") return null
+  const Icon = ICONS_MAP.get(name)
+  return Icon ? <Icon className={className} /> : null
 }
 
 import { Button } from "@/components/ui/button"
@@ -84,6 +58,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import type { ComponentEntry } from "./types"
+import { ICONS_MAP } from "./icon-categories"
 
 export const components: ComponentEntry[] = [
 
@@ -1057,8 +1032,8 @@ export default function Example() {
       children:  { type: "text",    defaultValue: "Button" },
       variant:   { type: "select",  options: ["default","destructive","outline","secondary","ghost","link"], defaultValue: "default" },
       size:      { type: "select",  options: ["default","xs","sm","lg","icon","icon-xs","icon-sm","icon-lg"], defaultValue: "default" },
-      iconLeft:  { type: "select",  options: [...BUTTON_ICON_OPTIONS], defaultValue: "none" },
-      iconRight: { type: "select",  options: [...BUTTON_ICON_OPTIONS], defaultValue: "none" },
+      iconLeft:  { type: "icon", defaultValue: "none" },
+      iconRight: { type: "icon", defaultValue: "none" },
       loading:   { type: "boolean", defaultValue: false },
       disabled:  { type: "boolean", defaultValue: false },
       invalid:   { type: "boolean", defaultValue: false },
@@ -1067,7 +1042,7 @@ export default function Example() {
       const { size, children, variant, disabled, loading, iconLeft, iconRight, invalid } = props as {
         size: string; children: string; variant: string
         disabled: boolean; loading: boolean
-        iconLeft: ButtonIconName; iconRight: ButtonIconName
+        iconLeft: string; iconRight: string
         invalid: boolean
       }
       const isIconSize = size.startsWith("icon")
@@ -1075,9 +1050,8 @@ export default function Example() {
       if (loading) {
         content = <><Loader2 className="animate-spin" />{!isIconSize && (children || "Button")}</>
       } else if (isIconSize) {
-        // icon-only: show left icon if chosen, else right, else fallback Mail
         const singleIcon = iconLeft !== "none" ? iconLeft : iconRight !== "none" ? iconRight : "Mail"
-        content = <ButtonIcon name={singleIcon as ButtonIconName} />
+        content = <ButtonIcon name={singleIcon} />
       } else {
         content = (
           <>
@@ -1098,7 +1072,7 @@ export default function Example() {
       const { children, size, variant, disabled, loading, iconLeft, iconRight, invalid } = props as {
         children: string; size: string; variant: string
         disabled: boolean; loading: boolean
-        iconLeft: ButtonIconName; iconRight: ButtonIconName
+        iconLeft: string; iconRight: string
         invalid: boolean
       }
       const isIconSize = size.startsWith("icon")

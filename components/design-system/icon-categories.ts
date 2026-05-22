@@ -22,6 +22,9 @@ export const ALL_ICONS: IconEntry[] = (Object.entries(LucideIcons) as [string, u
   }
 ) as IconEntry[]
 
+/** Fast name → component lookup for the full icon set. */
+export const ICONS_MAP: Map<string, IconComponent> = new Map(ALL_ICONS)
+
 // ─── Category rules (first match wins) ───────────────────────────────────────
 
 const RULES: [id: string, label: string, test: RegExp][] = [

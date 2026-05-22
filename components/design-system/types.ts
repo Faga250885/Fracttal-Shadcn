@@ -29,11 +29,17 @@ export type NumberControl = {
   step?: number
 }
 
+export type IconControl = {
+  type: "icon"
+  defaultValue: string   // icon name or "none"
+}
+
 export type ControlDefinition =
   | SelectControl
   | BooleanControl
   | TextControl
   | NumberControl
+  | IconControl
 
 export type ComponentEntry = {
   id: string
