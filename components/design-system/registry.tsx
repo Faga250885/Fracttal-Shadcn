@@ -68,14 +68,16 @@ export const components: ComponentEntry[] = [
       itemCount:    { type: "select",  options: ["2", "3", "4"], defaultValue: "3" },
       collapsible:  { type: "boolean", defaultValue: true },
       defaultOpen:  { type: "boolean", defaultValue: true },
+      bordered:     { type: "boolean", defaultValue: false },
       disabled:     { type: "boolean", defaultValue: false },
     },
     render: (props) => {
-      const { type, itemCount, collapsible, defaultOpen, disabled } = props as {
+      const { type, itemCount, collapsible, defaultOpen, bordered, disabled } = props as {
         type: "single" | "multiple"
         itemCount: string
         collapsible: boolean
         defaultOpen: boolean
+        bordered: boolean
         disabled: boolean
       }
       const count = Number(itemCount) || 3
@@ -92,7 +94,7 @@ export const components: ComponentEntry[] = [
           : { type: "multiple" as const, defaultValue: defaultOpen ? ["item-1"] : [] }
 
       return (
-        <Accordion {...accordionProps} className="w-80">
+        <Accordion {...accordionProps} className={bordered ? "w-80 border rounded-lg px-4" : "w-80"}>
           {items.map((item) => (
             <AccordionItem key={item.value} value={item.value} disabled={disabled}>
               <AccordionTrigger>{item.trigger}</AccordionTrigger>
@@ -103,8 +105,8 @@ export const components: ComponentEntry[] = [
       )
     },
     generateCode: (props) => {
-      const { type, itemCount, collapsible, defaultOpen, disabled } = props as {
-        type: string; itemCount: string; collapsible: boolean; defaultOpen: boolean; disabled: boolean
+      const { type, itemCount, collapsible, defaultOpen, bordered, disabled } = props as {
+        type: string; itemCount: string; collapsible: boolean; defaultOpen: boolean; bordered: boolean; disabled: boolean
       }
       const count = Number(itemCount) || 3
       const items = [
@@ -121,6 +123,7 @@ export const components: ComponentEntry[] = [
       } else {
         if (defaultOpen) rootAttrs.push(`defaultValue={["item-1"]}`)
       }
+      rootAttrs.push(bordered ? `className="w-80 border rounded-lg px-4"` : `className="w-80"`)
 
       const itemRows = items.map(item => {
         const disabledAttr = disabled ? " disabled" : ""
@@ -133,7 +136,7 @@ export const components: ComponentEntry[] = [
       }).join("\n")
 
       const attrStr = rootAttrs.join(" ")
-      const body = `<Accordion ${attrStr} className="w-80">\n${itemRows}\n</Accordion>`
+      const body = `<Accordion ${attrStr}>\n${itemRows}\n</Accordion>`
       const indented = body.split("\n").map(l => `    ${l}`).join("\n")
       return `import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
     },
