@@ -7,7 +7,41 @@ import {
   CreditCard, Settings, Users, UserPlus, Plus, LogOut, Trash2,
   LayoutGrid, Activity, PanelLeft,
   PanelTop, PanelBottom, PanelRight,
+  // Button icons
+  ArrowRight, ArrowLeft, ChevronRight, ChevronLeft,
+  X, Check, Download, Upload, Send, Save,
+  Edit, Copy, Eye, ExternalLink, Star,
+  RefreshCw, Filter, Heart, Share2, Link2,
 } from "lucide-react"
+
+// ─── Button icon palette ──────────────────────────────────────────────────────
+
+const BUTTON_ICON_OPTIONS = [
+  "none",
+  "ArrowRight","ArrowLeft","ChevronRight","ChevronLeft",
+  "Plus","X","Check","Download","Upload",
+  "Search","Mail","Send","Save","Edit",
+  "Trash2","Copy","Eye","ExternalLink","Star",
+  "Settings","User","Lock","RefreshCw","Filter",
+  "Heart","Share2","Link2","Bell",
+] as const
+
+type ButtonIconName = (typeof BUTTON_ICON_OPTIONS)[number]
+
+const BUTTON_ICON_MAP: Record<Exclude<ButtonIconName, "none">, React.ComponentType<{ className?: string }>> = {
+  ArrowRight, ArrowLeft, ChevronRight, ChevronLeft,
+  Plus, X, Check, Download, Upload,
+  Search, Mail, Send, Save, Edit,
+  Trash2, Copy, Eye, ExternalLink, Star,
+  Settings, User, Lock, RefreshCw, Filter,
+  Heart, Share2, Link2, Bell,
+}
+
+function ButtonIcon({ name, ...props }: { name: ButtonIconName; className?: string }) {
+  if (name === "none") return null
+  const Icon = BUTTON_ICON_MAP[name]
+  return Icon ? <Icon {...props} /> : null
+}
 
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
@@ -1023,30 +1057,35 @@ export default function Example() {
       children:  { type: "text",    defaultValue: "Button" },
       variant:   { type: "select",  options: ["default","destructive","outline","secondary","ghost","link"], defaultValue: "default" },
       size:      { type: "select",  options: ["default","xs","sm","lg","icon","icon-xs","icon-sm","icon-lg"], defaultValue: "default" },
-      icon:      { type: "select",  options: ["none","start","end","both"], defaultValue: "none" },
+      iconLeft:  { type: "select",  options: [...BUTTON_ICON_OPTIONS], defaultValue: "none" },
+      iconRight: { type: "select",  options: [...BUTTON_ICON_OPTIONS], defaultValue: "none" },
       loading:   { type: "boolean", defaultValue: false },
       disabled:  { type: "boolean", defaultValue: false },
       invalid:   { type: "boolean", defaultValue: false },
     },
     render: (props) => {
-      const { size, children, variant, disabled, loading, icon, invalid } = props as {
+      const { size, children, variant, disabled, loading, iconLeft, iconRight, invalid } = props as {
         size: string; children: string; variant: string
-        disabled: boolean; loading: boolean; icon: string; invalid: boolean
+        disabled: boolean; loading: boolean
+        iconLeft: ButtonIconName; iconRight: ButtonIconName
+        invalid: boolean
       }
       const isIconSize = size.startsWith("icon")
       let content: React.ReactNode
       if (loading) {
         content = <><Loader2 className="animate-spin" />{!isIconSize && (children || "Button")}</>
       } else if (isIconSize) {
-        content = <Mail />
-      } else if (icon === "start") {
-        content = <><Mail data-icon="inline-start" />{children || "Button"}</>
-      } else if (icon === "end") {
-        content = <>{children || "Button"}<Mail data-icon="inline-end" /></>
-      } else if (icon === "both") {
-        content = <><Mail data-icon="inline-start" />{children || "Button"}<Mail data-icon="inline-end" /></>
+        // icon-only: show left icon if chosen, else right, else fallback Mail
+        const singleIcon = iconLeft !== "none" ? iconLeft : iconRight !== "none" ? iconRight : "Mail"
+        content = <ButtonIcon name={singleIcon as ButtonIconName} />
       } else {
-        content = <>{children || "Button"}</>
+        content = (
+          <>
+            {iconLeft !== "none" && <ButtonIcon name={iconLeft} />}
+            {children || "Button"}
+            {iconRight !== "none" && <ButtonIcon name={iconRight} />}
+          </>
+        )
       }
       return (
         <Button size={size as never} variant={variant as never}
@@ -1056,45 +1095,55 @@ export default function Example() {
       )
     },
     generateCode: (props) => {
-      const { children, size, variant, disabled, loading, icon, invalid } = props as {
+      const { children, size, variant, disabled, loading, iconLeft, iconRight, invalid } = props as {
         children: string; size: string; variant: string
-        disabled: boolean; loading: boolean; icon: string; invalid: boolean
+        disabled: boolean; loading: boolean
+        iconLeft: ButtonIconName; iconRight: ButtonIconName
+        invalid: boolean
       }
       const isIconSize = size.startsWith("icon")
-      const needsLoader = loading
-      const needsMail = (isIconSize || icon === "start" || icon === "end" || icon === "both") && !loading
+      const singleIcon = iconLeft !== "none" ? iconLeft : iconRight !== "none" ? iconRight : "Mail"
 
       let inner: string
       if (loading) {
-        inner = isIconSize ? `\n  <Loader2 className="animate-spin" />\n` : `\n  <Loader2 className="animate-spin" />\n  ${children || "Button"}\n`
+        inner = isIconSize
+          ? `\n  <Loader2 className="animate-spin" />\n`
+          : `\n  <Loader2 className="animate-spin" />\n  ${children || "Button"}\n`
       } else if (isIconSize) {
-        inner = `\n  <Mail />\n`
-      } else if (icon === "start") {
-        inner = `\n  <Mail data-icon="inline-start" />\n  ${children || "Button"}\n`
-      } else if (icon === "end") {
-        inner = `\n  ${children || "Button"}\n  <Mail data-icon="inline-end" />\n`
-      } else if (icon === "both") {
-        inner = `\n  <Mail data-icon="inline-start" />\n  ${children || "Button"}\n  <Mail data-icon="inline-end" />\n`
+        inner = `\n  <${singleIcon} />\n`
       } else {
-        inner = children || "Button"
+        const leftPart  = iconLeft  !== "none" ? `\n  <${iconLeft} />` : ""
+        const rightPart = iconRight !== "none" ? `\n  <${iconRight} />` : ""
+        const hasIcons  = leftPart || rightPart
+        inner = hasIcons
+          ? `${leftPart}\n  ${children || "Button"}${rightPart}\n`
+          : children || "Button"
       }
 
       const attrs: string[] = []
       if (variant !== "default") attrs.push(`variant="${variant}"`)
-      if (size !== "default") attrs.push(`size="${size}"`)
-      if (disabled || loading) attrs.push("disabled")
-      if (invalid) attrs.push('aria-invalid="true"')
+      if (size    !== "default") attrs.push(`size="${size}"`)
+      if (disabled || loading)   attrs.push("disabled")
+      if (invalid)               attrs.push('aria-invalid="true"')
       const attrStr = attrs.length === 0 ? "" : attrs.length === 1 ? ` ${attrs[0]}` : `\n  ${attrs.join("\n  ")}\n`
-      const ml = attrs.length >= 2
+      const ml  = attrs.length >= 2
       const tag = ml
         ? `<Button${attrStr}>${inner.startsWith("\n") ? inner : `\n  ${inner}\n`}</Button>`
         : `<Button${attrStr}>${inner}</Button>`
       const indented = tag.split("\n").map(l => `    ${l}`).join("\n")
-      const icons: string[] = []
-      if (needsLoader) icons.push("Loader2")
-      if (needsMail) icons.push("Mail")
-      const iconLine = icons.length ? `import { ${icons.join(", ")} } from "lucide-react"\n` : ""
-      return `${iconLine}import { Button } from "@/components/ui/button"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
+
+      // Collect unique icon imports
+      const usedIcons = new Set<string>()
+      if (loading) usedIcons.add("Loader2")
+      else if (isIconSize) usedIcons.add(singleIcon)
+      else {
+        if (iconLeft  !== "none") usedIcons.add(iconLeft)
+        if (iconRight !== "none") usedIcons.add(iconRight)
+      }
+      const iconImport = usedIcons.size
+        ? `import { ${[...usedIcons].join(", ")} } from "lucide-react"\n`
+        : ""
+      return `${iconImport}import { Button } from "@/components/ui/button"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
     },
   },
 
