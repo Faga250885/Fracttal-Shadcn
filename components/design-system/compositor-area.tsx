@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import type { LucideIcon } from "lucide-react"
 import {
-  Sun, Moon, X, Pencil, Eye, PenLine, Square, Columns2, LayoutGrid, Search, Plus,
+  Sun, Moon, X, Pencil, Eye, PenLine, Square, Columns2, LayoutGrid, Search, Plus, Ban,
   ChevronsUpDown, AlertCircle, AlertTriangle, BellRing,
   AppWindow, ChevronDown, CircleUser, Tag,
   MousePointerClick, Calendar, CheckSquare, TextCursorInput,
@@ -60,6 +60,9 @@ const ITEM_ICONS: Record<string, LucideIcon> = {
   "radio-group": CircleDot, select: ListFilter, slider: SlidersHorizontal,
   switch: ToggleLeft, tabs: LayoutDashboard, textarea: AlignLeft, tooltip: Info,
 }
+
+// Components that require a trigger/overlay and cannot be composed statically
+const COMPOSITOR_BLOCKED = new Set(["alert-dialog", "sonner", "tooltip", "dropdown-menu"])
 
 const PALETTE_GROUPS = [
   { label: "Feedback",      items: [{ id: "alert", name: "Alert" }, { id: "alert-dialog", name: "Alert Dialog" }, { id: "sonner", name: "Sonner" }, { id: "tooltip", name: "Tooltip" }] },
@@ -181,7 +184,18 @@ function ComponentDrawer({
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = ITEM_ICONS[item.id]
-                return (
+                const blocked = COMPOSITOR_BLOCKED.has(item.id)
+                return blocked ? (
+                  <div
+                    key={item.id}
+                    title="No disponible en el compositor"
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm text-zinc-300 cursor-not-allowed select-none"
+                  >
+                    {Icon && <Icon className="size-4 shrink-0 text-zinc-300" />}
+                    <span className="flex-1">{item.name}</span>
+                    <Ban className="size-3.5 shrink-0 text-zinc-300" />
+                  </div>
+                ) : (
                   <button
                     key={item.id}
                     onClick={() => onAdd(item)}
@@ -271,7 +285,7 @@ function RenderedItem({
         </div>
       )}
       <div className="w-full flex [&>*]:w-full [&>*]:!max-w-none">
-        {entry.render(item.props)}
+        {(entry.compositorRender ?? entry.render)(item.props)}
       </div>
     </div>
   )

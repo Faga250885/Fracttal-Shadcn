@@ -44,6 +44,8 @@ export type ComponentEntry = {
   controls: Record<string, ControlDefinition>
   cascade?: (key: string, value: unknown, current: Record<string, unknown>) => Record<string, unknown>
   render: (props: Record<string, unknown>) => ReactNode
+  /** Optional render used inside the Compositor (replaces `render` there). */
+  compositorRender?: (props: Record<string, unknown>) => ReactNode
   generateCode: (props: Record<string, unknown>) => string
   examples?: ComponentExample[]
 }

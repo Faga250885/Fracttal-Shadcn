@@ -1769,6 +1769,31 @@ export default function Example() {
         </Tabs>
       )
     },
+    compositorRender: (props) => {
+      const { variant, orientation, tabCount, tab1, tab2, tab3, tab4, disabled, icons } = props as {
+        variant: "default" | "line"; orientation: "horizontal" | "vertical"
+        tabCount: string; tab1: string; tab2: string; tab3: string; tab4: string
+        disabled: boolean; icons: string
+      }
+      const count = Number(tabCount) || 3
+      const iconEls = [<User className="size-4" key="u"/>, <Lock className="size-4" key="l"/>, <Bell className="size-4" key="b"/>, <Search className="size-4" key="s"/>]
+      const allLabels = [tab1 || "Account", tab2 || "Password", tab3 || "Notifications", tab4 || "Settings"]
+      const keys = ["tab1","tab2","tab3","tab4"].slice(0, count)
+      const labels = allLabels.slice(0, count)
+      const showIcon = icons !== "none"
+      const showLabel = icons !== "icons only"
+      return (
+        <Tabs defaultValue="tab1" orientation={orientation} className="w-full">
+          <TabsList variant={variant}>
+            {keys.map((k, i) => (
+              <TabsTrigger key={k} value={k} disabled={disabled && i === 1}>
+                {showIcon && iconEls[i]}{showLabel && labels[i]}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      )
+    },
     generateCode: (props) => {
       const { variant, orientation, tabCount, tab1, tab2, tab3, tab4, disabled, icons } = props as {
         variant: string; orientation: string; tabCount: string
