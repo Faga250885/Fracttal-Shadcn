@@ -117,6 +117,12 @@ const COLOR_GROUPS: ColorGroup[] = [
   },
 ]
 
+// rem → px (assumes 16 px root font size)
+function remToPx(rem: string): string {
+  const n = parseFloat(rem)
+  return isNaN(n) ? rem : `${Math.round(n * 16)}px`
+}
+
 const BASE_RADIUS = 0.5
 const RADIUS_SCALE = [
   { id: "sm",  cssVar: "--radius-sm",  tailwind: "rounded-sm",  value: `${(BASE_RADIUS * 0.6).toFixed(2)}rem` },
@@ -129,17 +135,17 @@ const RADIUS_SCALE = [
 ]
 
 const TYPOGRAPHY_STYLES = [
-  { name: "H1",         label: "Heading 1",     el: "h1",         classes: "scroll-m-20 text-4xl font-extrabold tracking-tight text-balance",                         sample: "Taxing Laughter: The Joke Tax Chronicles" },
-  { name: "H2",         label: "Heading 2",     el: "h2",         classes: "scroll-m-20 text-3xl font-semibold tracking-tight",                                        sample: "The People of the Kingdom" },
-  { name: "H3",         label: "Heading 3",     el: "h3",         classes: "scroll-m-20 text-2xl font-semibold tracking-tight",                                        sample: "The Joke Tax" },
-  { name: "H4",         label: "Heading 4",     el: "h4",         classes: "scroll-m-20 text-xl font-semibold tracking-tight",                                         sample: "People stopped telling jokes" },
-  { name: "p",          label: "Paragraph",     el: "p",          classes: "leading-7",                                                                                sample: "The king, seeing how much he was feared, sent tax collectors to every corner of his realm to collect the joke tax." },
-  { name: "Lead",       label: "Lead",          el: "p",          classes: "text-xl text-muted-foreground",                                                            sample: "A modal dialog that interrupts the user with important content." },
-  { name: "Large",      label: "Large",         el: "div",        classes: "text-lg font-semibold",                                                                    sample: "Are you absolutely sure?" },
-  { name: "Small",      label: "Small",         el: "small",      classes: "text-sm font-medium leading-none",                                                         sample: "Email address" },
-  { name: "Muted",      label: "Muted",         el: "p",          classes: "text-sm text-muted-foreground",                                                            sample: "Enter your email address." },
-  { name: "Code",       label: "Inline code",   el: "code",       classes: "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",        sample: "@radix-ui/react-alert-dialog" },
-  { name: "Blockquote", label: "Blockquote",    el: "blockquote", classes: "border-l-2 pl-6 italic",                                                                   sample: "After all, everyone enjoys a good joke, so it's only fair that they should pay for the privilege." },
+  { name: "H1",         label: "Heading 1",     el: "h1",         fontSize: "2.25rem",  classes: "scroll-m-20 text-4xl font-extrabold tracking-tight text-balance",                         sample: "Taxing Laughter: The Joke Tax Chronicles" },
+  { name: "H2",         label: "Heading 2",     el: "h2",         fontSize: "1.875rem", classes: "scroll-m-20 text-3xl font-semibold tracking-tight",                                        sample: "The People of the Kingdom" },
+  { name: "H3",         label: "Heading 3",     el: "h3",         fontSize: "1.5rem",   classes: "scroll-m-20 text-2xl font-semibold tracking-tight",                                        sample: "The Joke Tax" },
+  { name: "H4",         label: "Heading 4",     el: "h4",         fontSize: "1.25rem",  classes: "scroll-m-20 text-xl font-semibold tracking-tight",                                         sample: "People stopped telling jokes" },
+  { name: "p",          label: "Paragraph",     el: "p",          fontSize: "1rem",     classes: "leading-7",                                                                                sample: "The king, seeing how much he was feared, sent tax collectors to every corner of his realm to collect the joke tax." },
+  { name: "Lead",       label: "Lead",          el: "p",          fontSize: "1.25rem",  classes: "text-xl text-muted-foreground",                                                            sample: "A modal dialog that interrupts the user with important content." },
+  { name: "Large",      label: "Large",         el: "div",        fontSize: "1.125rem", classes: "text-lg font-semibold",                                                                    sample: "Are you absolutely sure?" },
+  { name: "Small",      label: "Small",         el: "small",      fontSize: "0.875rem", classes: "text-sm font-medium leading-none",                                                         sample: "Email address" },
+  { name: "Muted",      label: "Muted",         el: "p",          fontSize: "0.875rem", classes: "text-sm text-muted-foreground",                                                            sample: "Enter your email address." },
+  { name: "Code",       label: "Inline code",   el: "code",       fontSize: "0.875rem", classes: "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",        sample: "@radix-ui/react-alert-dialog" },
+  { name: "Blockquote", label: "Blockquote",    el: "blockquote", fontSize: "1rem",     classes: "border-l-2 pl-6 italic",                                                                   sample: "After all, everyone enjoys a good joke, so it's only fair that they should pay for the privilege." },
 ]
 
 // ── Copy chip ─────────────────────────────────────────────────────────────────
@@ -298,6 +304,7 @@ export function TokenView({
                     <CopyChip label={r.tailwind} />
                     <CopyChip label={r.cssVar} />
                     <span className="text-[10px] font-mono text-zinc-400">{r.value}</span>
+                    <span className="text-[10px] font-mono text-zinc-300">{remToPx(r.value)}</span>
                   </div>
                 </div>
               ))}
@@ -320,6 +327,9 @@ export function TokenView({
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{style.label}</span>
                       <code className="text-[10px] bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded font-mono">&lt;{style.el}&gt;</code>
+                      <span className="text-[10px] font-mono text-zinc-400">{style.fontSize}</span>
+                      <span className="text-[10px] font-mono text-zinc-300">·</span>
+                      <span className="text-[10px] font-mono text-zinc-400">{remToPx(style.fontSize)}</span>
                     </div>
                     <El className={cn(style.classes, "text-zinc-800")}>{style.sample}</El>
                     <div className="mt-3 pt-3 border-t border-zinc-100">
