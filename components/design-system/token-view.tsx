@@ -134,6 +134,33 @@ const RADIUS_SCALE = [
   { id: "4xl", cssVar: "--radius-4xl", tailwind: "rounded-4xl", value: `${(BASE_RADIUS * 2.6).toFixed(2)}rem` },
 ]
 
+const FONT_FAMILIES = [
+  {
+    cssVar:   "--font-sans",
+    tailwind: "font-sans",
+    label:    "Sans-serif",
+    value:    "Inter",
+    sample:   "The quick brown fox jumps over the lazy dog",
+    style:    { fontFamily: "var(--font-sans)" },
+  },
+  {
+    cssVar:   "--font-mono",
+    tailwind: "font-mono",
+    label:    "Monospace",
+    value:    "Geist Mono",
+    sample:   "const hello = () => 'world'",
+    style:    { fontFamily: "var(--font-mono)" },
+  },
+  {
+    cssVar:   "--font-heading",
+    tailwind: "font-heading",
+    label:    "Heading",
+    value:    "var(--font-sans)",
+    sample:   "Heading typeface alias",
+    style:    { fontFamily: "var(--font-heading)" },
+  },
+]
+
 const TYPOGRAPHY_STYLES = [
   { name: "H1",         label: "Heading 1",     el: "h1",         fontSize: "2.25rem",  classes: "scroll-m-20 text-4xl font-extrabold tracking-tight text-balance",                         sample: "Taxing Laughter: The Joke Tax Chronicles" },
   { name: "H2",         label: "Heading 2",     el: "h2",         fontSize: "1.875rem", classes: "scroll-m-20 text-3xl font-semibold tracking-tight",                                        sample: "The People of the Kingdom" },
@@ -319,6 +346,39 @@ export function TokenView({
               Tipografía
             </h2>
 
+            {/* Font families */}
+            <div className="mb-8">
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-3 text-zinc-400">
+                Familias tipográficas
+              </p>
+              <div className="flex flex-col gap-2">
+                {FONT_FAMILIES.map((f) => (
+                  <div
+                    key={f.cssVar}
+                    className="flex items-center gap-4 px-4 py-3 rounded-md border border-zinc-100 hover:bg-zinc-50/50 transition-colors"
+                  >
+                    <div className="w-32 shrink-0 flex flex-col gap-1">
+                      <CopyChip label={f.cssVar} />
+                      <CopyChip label={f.tailwind} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p style={f.style} className="text-base text-zinc-800 truncate">
+                        {f.sample}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-[11px] font-semibold text-zinc-600">{f.label}</p>
+                      <p className="text-[10px] text-zinc-400 font-mono">{f.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Type scale */}
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-3 text-zinc-400">
+              Escala tipográfica
+            </p>
             <div className="flex flex-col gap-3">
               {TYPOGRAPHY_STYLES.map((style) => {
                 const El = style.el as keyof React.JSX.IntrinsicElements
