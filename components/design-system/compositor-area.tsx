@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { components } from "./registry"
 import type { ComponentEntry } from "./types"
 import { RightPanel } from "./right-panel"
+import { CodeBlock } from "./code-block"
 import type { Lang } from "./i18n"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -537,6 +538,105 @@ function makeSection(type: Section["type"]): Section {
   return { id: uid(), type, cols }
 }
 
+// ─── Compositor code generator ────────────────────────────────────────────────
+
+function indentLines(code: string, spaces: number): string {
+  const pad = " ".repeat(spaces)
+  return code.split("\n").map((l) => `${pad}${l}`).join("\n")
+}
+
+/** Extracts imports + inner JSX from a full generateCode() output. */
+function extractFromCode(fullCode: string): { imports: string[]; jsx: string } {
+  const importLines = fullCode.split("\n").filter((l) => l.startsWith("import "))
+  const start = fullCode.indexOf("  return (\n")
+  const end   = fullCode.lastIndexOf("\n  )\n}")
+  if (start === -1 || end === -1) return { imports: importLines, jsx: "/* component */" }
+  const raw = fullCode.slice(start + "  return (\n".length, end)
+  // Strip 4-space indent added by generateCode wrapper
+  const jsx = raw.split("\n").map((l) => (l.startsWith("    ") ? l.slice(4) : l)).join("\n")
+  return { imports: importLines, jsx }
+}
+
+function generateCompositorCode(
+  sections: Section[],
+  padding: PaddingVal,
+  gap: GapVal,
+  radius: RadiusVal,
+  width: Dim,
+  height: Dim,
+  isDark: boolean,
+): string {
+  const allItems = sections.flatMap((s) => s.cols.flat())
+  if (allItems.length === 0) return "// Añade componentes al compositor para generar el código."
+
+  // Build per-item JSX map and collect imports
+  const importSet = new Set<string>()
+  const jsxByUid = new Map<string, string>()
+
+  for (const item of allItems) {
+    const entry = compMap[item.id]
+    if (!entry) continue
+    const { imports, jsx } = extractFromCode(entry.generateCode(item.props))
+    imports.forEach((i) => importSet.add(i))
+    jsxByUid.set(item.uid, jsx)
+  }
+
+  // Build section blocks
+  const gapClass = GAP_CLASS[gap]
+
+  function renderItems(col: DroppedItem[]): string {
+    return col.map((item) => jsxByUid.get(item.uid) ?? "/* unknown */").join("\n")
+  }
+
+  const sectionBlocks = sections
+    .map((section) => {
+      const isEmpty = section.cols.every((col) => col.length === 0)
+      if (isEmpty) return null
+
+      if (section.type === "1col") {
+        return renderItems(section.cols[0] ?? [])
+      }
+
+      const colCount = section.type === "2col" ? 2 : 3
+      const colsJSX = section.cols
+        .map((col) => {
+          if (col.length === 0) return `  <div />`
+          const inner = indentLines(renderItems(col), 4)
+          return `  <div className="flex flex-col ${gapClass}">\n${inner}\n  </div>`
+        })
+        .join("\n")
+
+      return `<div className="grid grid-cols-${colCount} gap-3">\n${colsJSX}\n</div>`
+    })
+    .filter(Boolean) as string[]
+
+  // Container
+  const containerClasses = [
+    "flex flex-col",
+    gapClass,
+    PADDING_CLASS[padding],
+    RADIUS_CLASS[radius],
+    "bg-background border border-border",
+    isDark ? "dark" : "",
+  ].filter(Boolean).join(" ")
+
+  const widthProp  = width.mode  === "fixed" ? ` style={{ width: ${width.px} }}` : ""
+  const heightProp = height.mode === "fixed" ? ` style={{ height: ${height.px}, overflowY: "auto" }}` : ""
+
+  const inner = indentLines(sectionBlocks.join("\n"), 6)
+  const importBlock = Array.from(importSet).sort().join("\n")
+
+  return `${importBlock}
+
+export default function Example() {
+  return (
+    <div className="${containerClasses}"${widthProp}${heightProp}>
+${inner}
+    </div>
+  )
+}`
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function CompositorArea({ lang }: { lang: Lang }) {
@@ -563,6 +663,11 @@ export function CompositorArea({ lang }: { lang: Lang }) {
     }
     return null
   }, [selectedUid, sections])
+
+  const compositorCode = useMemo(
+    () => generateCompositorCode(sections, padding, gap, radius, width, height, isDark),
+    [sections, padding, gap, radius, width, height, isDark],
+  )
 
   // ── Section management ───────────────────────────────────────────────────
   function addSection(type: Section["type"]) {
@@ -805,6 +910,17 @@ export function CompositorArea({ lang }: { lang: Lang }) {
                 </span>
               </div>
             </div>
+
+          {/* Code panel */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <h2 className="text-sm font-semibold tracking-tight text-zinc-700">Código</h2>
+              <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
+                Copia y pega en tu proyecto
+              </span>
+            </div>
+            <CodeBlock code={compositorCode} lang="en" />
+          </div>
 
           </div>
         </div>
