@@ -1298,7 +1298,7 @@ export default function Example() {
       disabled:    { type: "boolean", defaultValue: false },
       required:    { type: "boolean", defaultValue: false },
       invalid:     { type: "boolean", defaultValue: false },
-      showIcon:    { type: "boolean", defaultValue: false },
+      iconLeft:    { type: "icon",    defaultValue: "none" },
       showButton:  { type: "boolean", defaultValue: false },
     },
     cascade: (key, value) => {
@@ -1316,16 +1316,17 @@ export default function Example() {
       return presets[value as string] ?? {}
     },
     render: (props) => {
-      const { label, placeholder, type, disabled, description, required, invalid, showIcon, showButton } = props as {
+      const { label, placeholder, type, disabled, description, required, invalid, iconLeft, showButton } = props as {
         label: string; placeholder: string; type: string; disabled: boolean
-        description: string; required: boolean; invalid: boolean; showIcon: boolean; showButton: boolean
+        description: string; required: boolean; invalid: boolean; iconLeft: string; showButton: boolean
       }
+      const hasIcon = iconLeft && iconLeft !== "none"
       const inputEl = (
-        <div className={showIcon ? "relative flex-1 min-w-0" : showButton ? "flex-1 min-w-0" : ""}>
-          {showIcon && <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />}
+        <div className={hasIcon ? "relative flex-1 min-w-0" : showButton ? "flex-1 min-w-0" : ""}>
+          {hasIcon && <ButtonIcon name={iconLeft} className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />}
           <Input placeholder={placeholder} type={type as never} disabled={disabled}
             required={required || undefined} aria-invalid={invalid ? "true" : undefined}
-            className={showIcon ? "pl-8" : undefined} />
+            className={hasIcon ? "pl-8" : undefined} />
         </div>
       )
       return (
@@ -1342,23 +1343,24 @@ export default function Example() {
       )
     },
     generateCode: (props) => {
-      const { label, placeholder, type, disabled, description, required, invalid, showIcon, showButton } = props as {
+      const { label, placeholder, type, disabled, description, required, invalid, iconLeft, showButton } = props as {
         label: string; placeholder: string; type: string; disabled: boolean
-        description: string; required: boolean; invalid: boolean; showIcon: boolean; showButton: boolean
+        description: string; required: boolean; invalid: boolean; iconLeft: string; showButton: boolean
       }
+      const hasIcon = iconLeft && iconLeft !== "none"
       const inputAttrs: string[] = []
       if (type !== "text") inputAttrs.push(`type="${type}"`)
       if (placeholder) inputAttrs.push(`placeholder="${placeholder}"`)
       if (disabled) inputAttrs.push("disabled")
       if (required) inputAttrs.push("required")
       if (invalid) inputAttrs.push('aria-invalid="true"')
-      if (showIcon) inputAttrs.push('className="pl-8"')
+      if (hasIcon) inputAttrs.push('className="pl-8"')
       const inputTag = inputAttrs.length <= 1
         ? `<Input${inputAttrs.length ? " " + inputAttrs[0] : ""} />`
         : ["<Input", ...inputAttrs.map(a => `  ${a}`), "/>"].join("\n")
-      const iconLine = showIcon
-        ? `<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />\n    ` : ""
-      const wrappedInput = showIcon
+      const iconLine = hasIcon
+        ? `<${iconLeft} className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />\n    ` : ""
+      const wrappedInput = hasIcon
         ? `<div className="relative">\n    ${iconLine}${inputTag.split("\n").join("\n    ")}\n    </div>` : inputTag
       const labelContent = label ? `${label}${required ? `{" "}<span className="text-destructive" aria-hidden="true">*</span>` : ""}` : ""
       const labelLine = label ? `<label className="text-sm font-medium">\n      ${labelContent}\n    </label>\n    ` : ""
@@ -1369,7 +1371,7 @@ export default function Example() {
         : `${labelLine}${wrappedInput}${descLine}${errorLine}`
       const indented = inner.split("\n").map(l => `    ${l}`).join("\n")
       const imports = [
-        showIcon ? 'import { Search } from "lucide-react"' : null,
+        hasIcon ? `import { ${iconLeft} } from "lucide-react"` : null,
         showButton ? 'import { Button } from "@/components/ui/button"' : null,
         'import { Input } from "@/components/ui/input"',
       ].filter(Boolean).join("\n")
