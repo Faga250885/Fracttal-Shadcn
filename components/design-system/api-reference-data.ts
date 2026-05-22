@@ -11,7 +11,7 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
     {
       prop: "type",
       type: '"single" | "multiple"',
-      default: '"single"',
+      required: true,
       description: "Whether one or multiple items can be open at a time.",
     },
     {
@@ -76,6 +76,12 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
 
   avatar: [
     {
+      prop: "size",
+      type: '"default" | "sm" | "lg"',
+      default: '"default"',
+      description: "Controls the dimensions of the avatar.",
+    },
+    {
       prop: "src",
       type: "string",
       description: "Image URL for AvatarImage.",
@@ -107,7 +113,7 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
   badge: [
     {
       prop: "variant",
-      type: '"default" | "secondary" | "destructive" | "outline"',
+      type: '"default" | "secondary" | "destructive" | "outline" | "ghost" | "link"',
       default: '"default"',
       description: "Visual style variant of the badge.",
     },
@@ -138,7 +144,7 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
     },
     {
       prop: "size",
-      type: '"default" | "sm" | "lg" | "icon"',
+      type: '"default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"',
       default: '"default"',
       description: "Size of the button.",
     },
@@ -222,6 +228,16 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       default: "false",
       description: "Move focus to the calendar on mount.",
     },
+    {
+      prop: "captionLayout",
+      type: '"dropdown"',
+      description: "Enables month/year dropdown selectors in the calendar header.",
+    },
+    {
+      prop: "timeZone",
+      type: "string",
+      description: "User's IANA timezone for proper date display (e.g. 'America/New_York').",
+    },
   ],
 
   checkbox: [
@@ -298,6 +314,12 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       prop: "children",
       type: "React.ReactNode",
       description: "Trigger, content, and other dialog sub-components.",
+    },
+    {
+      prop: "showCloseButton",
+      type: "boolean",
+      default: "true",
+      description: "Show or hide the default close (×) button on DialogContent.",
     },
   ],
 
@@ -494,6 +516,17 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       type: "string",
       description: "Text shown in SelectTrigger when no value is selected.",
     },
+    {
+      prop: "dir",
+      type: '"ltr" | "rtl"',
+      description: "Reading direction for keyboard navigation.",
+    },
+    {
+      prop: "position",
+      type: '"item-aligned" | "popper"',
+      default: '"item-aligned"',
+      description: "Positioning strategy of SelectContent relative to the trigger.",
+    },
   ],
 
   slider: [
@@ -606,6 +639,12 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       type: "string",
       description: "HTML id — used to associate with a <label>.",
     },
+    {
+      prop: "size",
+      type: '"default" | "sm"',
+      default: '"default"',
+      description: "Controls the visual size of the switch thumb and track.",
+    },
   ],
 
   tabs: [
@@ -646,6 +685,12 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       type: "boolean",
       default: "false",
       description: "Merge props onto the immediate child element.",
+    },
+    {
+      prop: "variant",
+      type: '"default" | "line"',
+      default: '"default"',
+      description: "Visual style of TabsList — pill/filled or underline.",
     },
   ],
 
