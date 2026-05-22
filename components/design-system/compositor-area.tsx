@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import type { LucideIcon } from "lucide-react"
 import {
-  Sun, Moon, X, Pencil, Eye, PenLine, Square, Columns2, LayoutGrid, Search, Plus, Ban,
+  Sun, Moon, X, Pencil, Eye, PenLine, Square, Columns2, LayoutGrid, Search, Plus,
   ChevronsUpDown, AlertCircle, AlertTriangle, BellRing,
   AppWindow, ChevronDown, CircleUser, Tag,
   MousePointerClick, Calendar, CheckSquare, TextCursorInput,
@@ -147,7 +147,7 @@ function ComponentDrawer({
   const [search, setSearch] = useState("")
   const query = search.toLowerCase()
   const filtered = PALETTE_GROUPS
-    .map((g) => ({ ...g, items: g.items.filter((c) => c.name.toLowerCase().includes(query)) }))
+    .map((g) => ({ ...g, items: g.items.filter((c) => !COMPOSITOR_BLOCKED.has(c.id) && c.name.toLowerCase().includes(query)) }))
     .filter((g) => g.items.length > 0)
 
   return (
@@ -185,18 +185,7 @@ function ComponentDrawer({
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = ITEM_ICONS[item.id]
-                const blocked = COMPOSITOR_BLOCKED.has(item.id)
-                return blocked ? (
-                  <div
-                    key={item.id}
-                    title="No disponible en el compositor"
-                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm text-zinc-300 cursor-not-allowed select-none"
-                  >
-                    {Icon && <Icon className="size-4 shrink-0 text-zinc-300" />}
-                    <span className="flex-1">{item.name}</span>
-                    <Ban className="size-3.5 shrink-0 text-zinc-300" />
-                  </div>
-                ) : (
+                return (
                   <button
                     key={item.id}
                     onClick={() => onAdd(item)}
