@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Sun, Moon } from "lucide-react"
+import { Sun, Moon, ChevronDown, ChevronUp } from "lucide-react"
 import type { ComponentEntry } from "./types"
 import { CodeBlock } from "./code-block"
 import { ApiTable } from "./api-table"
@@ -56,6 +56,7 @@ function buildSummary(
 
 export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
   const [mode, setMode] = useState<Mode>("light")
+  const [codeOpen, setCodeOpen] = useState(false)
   const t = translations[lang]
   const isDark = mode === "dark"
 
@@ -74,9 +75,9 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto">
 
-        {/* Preview section */}
+        {/* Preview + collapsible code */}
         <div className="px-4 pt-4">
-          {/* Title row — above the canvas */}
+          {/* Title row */}
           <div className="flex items-center gap-4 mb-4">
             <h2 className="text-sm font-semibold tracking-tight">{t.preview}</h2>
             {component && (
@@ -86,88 +87,101 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
             )}
           </div>
 
-          {/* Canvas */}
-          <div
-            className={[
-              "relative min-h-[260px] flex items-center justify-center px-8 pt-14 pb-8 rounded-xl transition-colors duration-200",
-              isDark ? "bg-zinc-900 dark text-foreground border border-transparent" : "bg-white text-foreground border border-zinc-100",
-            ].join(" ")}
-          >
-            {/* Dot pattern — mesa de trabajo, opaca en bordes, transparente en centro */}
+          {/* Canvas + code as one rounded card */}
+          <div className={[
+            "rounded-xl border overflow-hidden transition-colors duration-200",
+            isDark ? "border-transparent" : "border-zinc-100",
+          ].join(" ")}>
+
+            {/* Canvas */}
             <div
-              aria-hidden
-              className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden"
-              style={{
-                backgroundImage: `radial-gradient(circle, ${
-                  isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"
-                } 1px, transparent 1px)`,
-                backgroundSize: "14px 14px",
-                maskImage:
-                  "linear-gradient(to right, black 0%, transparent 22%, transparent 78%, black 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(to right, black 0%, transparent 22%, transparent 78%, black 100%)",
-              }}
-            />
+              className={[
+                "relative min-h-[260px] flex items-center justify-center px-8 pt-14 pb-8 transition-colors duration-200",
+                isDark ? "bg-zinc-900 dark text-foreground" : "bg-white text-foreground",
+              ].join(" ")}
+            >
+              {/* Dot pattern */}
+              <div
+                aria-hidden
+                className="absolute inset-0 pointer-events-none overflow-hidden"
+                style={{
+                  backgroundImage: `radial-gradient(circle, ${
+                    isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"
+                  } 1px, transparent 1px)`,
+                  backgroundSize: "14px 14px",
+                  maskImage:
+                    "linear-gradient(to right, black 0%, transparent 22%, transparent 78%, black 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to right, black 0%, transparent 22%, transparent 78%, black 100%)",
+                }}
+              />
 
-            {/* Summary chips — top left */}
-            {component && (
-              <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[55%]">
-                {buildSummary(component, propValues).map(({ label, value }) => (
-                  <span
-                    key={label}
-                    className={[
-                      "text-[10px] px-1.5 py-0.5 rounded-md leading-none flex items-center gap-1",
-                      isDark
-                        ? "bg-white/10 text-white/50"
-                        : "bg-black/5 text-zinc-400",
-                    ].join(" ")}
-                  >
-                    <span className="font-medium">{label}</span>
-                    <span className={isDark ? "text-white/30" : "text-zinc-300"}>·</span>
-                    <span>{value}</span>
-                  </span>
-                ))}
+              {/* Summary chips */}
+              {component && (
+                <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[55%]">
+                  {buildSummary(component, propValues).map(({ label, value }) => (
+                    <span
+                      key={label}
+                      className={[
+                        "text-[10px] px-1.5 py-0.5 rounded-md leading-none flex items-center gap-1",
+                        isDark ? "bg-white/10 text-white/50" : "bg-black/5 text-zinc-400",
+                      ].join(" ")}
+                    >
+                      <span className="font-medium">{label}</span>
+                      <span className={isDark ? "text-white/30" : "text-zinc-300"}>·</span>
+                      <span>{value}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Light / Dark toggle */}
+              <div className="absolute top-3 right-3">
+                <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
+                  <TabsList className="h-7 p-0.5">
+                    <TabsTrigger value="light" className="h-6 w-7 px-0">
+                      <Sun className="size-3.5" />
+                    </TabsTrigger>
+                    <TabsTrigger value="dark" className="h-6 w-7 px-0">
+                      <Moon className="size-3.5" />
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
-            )}
 
-            {/* Light / Dark toggle */}
-            <div className="absolute top-3 right-3">
-              <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
-                <TabsList className="h-7 p-0.5">
-                  <TabsTrigger value="light" className="h-6 w-7 px-0">
-                    <Sun className="size-3.5" />
-                  </TabsTrigger>
-                  <TabsTrigger value="dark" className="h-6 w-7 px-0">
-                    <Moon className="size-3.5" />
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+              {component ? (
+                component.render(propValues)
+              ) : (
+                <p className="text-sm text-muted-foreground">{t.selectFromLeft}</p>
+              )}
             </div>
 
-            {component ? (
-              component.render(propValues)
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                {t.selectFromLeft}
-              </p>
+            {/* Collapsible code toggle */}
+            {component && (
+              <>
+                <button
+                  onClick={() => setCodeOpen(v => !v)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-t border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                >
+                  {codeOpen
+                    ? <ChevronUp className="size-3.5 shrink-0" />
+                    : <ChevronDown className="size-3.5 shrink-0" />
+                  }
+                  <span>{t.implementation}</span>
+                  <span className="ml-auto text-zinc-600">
+                    {codeOpen ? "Hide code" : "View code"}
+                  </span>
+                </button>
+
+                {codeOpen && (
+                  <div className="[&>div]:rounded-none [&>div]:border-0 [&>div]:border-t [&>div]:border-zinc-800">
+                    <CodeBlock code={component.generateCode(propValues)} lang={lang} />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
-
-        {/* Code section */}
-        {component && (
-          <div className="p-4">
-            <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-sm font-semibold tracking-tight">
-                {t.implementation}
-              </h2>
-              <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
-                {t.copyPaste}
-              </span>
-            </div>
-            <CodeBlock code={component.generateCode(propValues)} lang={lang} />
-          </div>
-        )}
 
         {/* API Reference section */}
         {component && API_REFERENCE[component.id] && (
@@ -181,33 +195,8 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
             <ApiTable props={API_REFERENCE[component.id]} />
           </div>
         )}
-
-        {/* Examples section */}
-        {component?.examples && component.examples.length > 0 && (
-          <div className="p-4">
-            <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-sm font-semibold tracking-tight">Ejemplos</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {component.examples.map((ex) => (
-                <div key={ex.title} className="flex flex-col gap-3">
-                  <p className="text-xs font-medium text-zinc-500">{ex.title}</p>
-                  <div
-                    className={[
-                      "rounded-xl p-4 flex items-center justify-center min-h-[80px] transition-colors duration-200",
-                      isDark
-                        ? "bg-zinc-900 dark text-foreground"
-                        : "bg-zinc-100 text-foreground",
-                    ].join(" ")}
-                  >
-                    {ex.render()}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </main>
   )
 }
+

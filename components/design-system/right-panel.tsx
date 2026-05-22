@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
@@ -29,7 +30,9 @@ export function RightPanel({ component, propValues, onChange, lang }: RightPanel
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {component ? (
-          Object.entries(component.controls).map(([key, control]) => (
+          Object.entries(component.controls)
+            .filter(([key]) => !component.controlVisible || component.controlVisible(key, propValues))
+            .map(([key, control]) => (
             <ControlField
               key={key}
               propName={key}
@@ -88,22 +91,10 @@ function ControlField({ propName, control, value, onChange }: ControlFieldProps)
     return (
       <div className="flex items-center justify-between">
         <label className="text-xs font-medium text-muted-foreground">{label}</label>
-        <button
-          role="switch"
-          aria-checked={value as boolean}
-          onClick={() => onChange(!(value as boolean))}
-          className={[
-            "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
-            value ? "bg-blue-600" : "bg-zinc-200",
-          ].join(" ")}
-        >
-          <span
-            className={[
-              "inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform",
-              value ? "translate-x-[18px]" : "translate-x-[2px]",
-            ].join(" ")}
-          />
-        </button>
+        <Switch
+          checked={value as boolean}
+          onCheckedChange={(checked) => onChange(checked)}
+        />
       </div>
     )
   }

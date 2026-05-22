@@ -63,7 +63,7 @@ const ITEM_ICONS: Record<string, LucideIcon> = {
 }
 
 // Components that require a trigger/overlay and cannot be composed statically
-const COMPOSITOR_BLOCKED = new Set(["alert-dialog", "sonner", "tooltip", "dropdown-menu"])
+const COMPOSITOR_BLOCKED = new Set(["alert-dialog", "sonner", "tooltip", "dropdown-menu", "dialog"])
 
 const PALETTE_GROUPS = [
   { label: "Feedback",      items: [{ id: "alert", name: "Alert" }, { id: "alert-dialog", name: "Alert Dialog" }, { id: "sonner", name: "Sonner" }, { id: "tooltip", name: "Tooltip" }] },

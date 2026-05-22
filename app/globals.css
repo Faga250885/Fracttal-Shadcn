@@ -4,7 +4,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes indeterminate-progress {
+  0%   { transform: translateX(-100%) scaleX(0.3); }
+  50%  { transform: translateX(0%)    scaleX(0.6); }
+  100% { transform: translateX(100%)  scaleX(0.3); }
+}
+
 @theme inline {
+    --animate-indeterminate-progress: indeterminate-progress 1.4s ease-in-out infinite;
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
     --color-sidebar-ring: var(--sidebar-ring);

@@ -50,7 +50,7 @@ const COMP_GROUPS: CompGroup[] = [
   {
     id: "form",
     label: "Form & Inputs",
-    ids: ["button", "calendar", "checkbox", "input", "radio-group", "select", "slider", "switch", "textarea"],
+    ids: ["button", "button-group", "calendar", "checkbox", "input", "radio-group", "select", "slider", "switch", "textarea"],
   },
   {
     id: "display",
@@ -70,6 +70,7 @@ const COMP_ITEM_ICONS: Record<string, LucideIcon> = {
   avatar:         CircleUser,
   badge:          Tag,
   button:         MousePointerClick,
+  "button-group": LayoutGrid,
   calendar:       Calendar,
   checkbox:       CheckSquare,
   input:          TextCursorInput,

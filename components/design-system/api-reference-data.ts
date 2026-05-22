@@ -7,6 +7,37 @@ export interface ApiProp {
 }
 
 export const API_REFERENCE: Record<string, ApiProp[]> = {
+  "button-group": [
+    {
+      prop: "orientation",
+      type: '"horizontal" | "vertical"',
+      default: '"horizontal"',
+      description: "Direction in which buttons are stacked.",
+    },
+    {
+      prop: "className",
+      type: "string",
+      description: "Additional CSS classes for the group container.",
+    },
+    {
+      prop: "children",
+      type: "React.ReactNode",
+      description: "Button, ButtonGroupSeparator, or ButtonGroupText elements.",
+    },
+    {
+      prop: "ButtonGroupSeparator · orientation",
+      type: '"horizontal" | "vertical"',
+      default: '"vertical"',
+      description: "Orientation of the separator line between buttons.",
+    },
+    {
+      prop: "ButtonGroupText · asChild",
+      type: "boolean",
+      default: "false",
+      description: "Merge props onto the immediate child element.",
+    },
+  ],
+
   accordion: [
     {
       prop: "type",
@@ -46,12 +77,6 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       type: '"horizontal" | "vertical"',
       default: '"vertical"',
       description: "Orientation of the accordion.",
-    },
-    {
-      prop: "asChild",
-      type: "boolean",
-      default: "false",
-      description: "Merge props onto the immediate child element.",
     },
   ],
 
@@ -191,11 +216,6 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       description: "The month displayed on first render.",
     },
     {
-      prop: "onSelect",
-      type: "(date: Date | undefined) => void",
-      description: "Callback fired when a date is selected.",
-    },
-    {
       prop: "disabled",
       type: "Matcher | Matcher[]",
       description: "Dates to disable. Accepts a date, range, or matcher fn.",
@@ -230,8 +250,20 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
     },
     {
       prop: "captionLayout",
-      type: '"dropdown"',
-      description: "Enables month/year dropdown selectors in the calendar header.",
+      type: '"label" | "dropdown" | "dropdown-months" | "dropdown-years"',
+      default: '"label"',
+      description: "Controls the calendar header — plain label or month/year dropdowns.",
+    },
+    {
+      prop: "buttonVariant",
+      type: '"default" | "destructive" | "outline" | "secondary" | "ghost" | "link"',
+      default: '"ghost"',
+      description: "Variant applied to the navigation and day buttons inside the calendar.",
+    },
+    {
+      prop: "onSelect",
+      type: "(value: Date | Date[] | DateRange | undefined) => void",
+      description: "Callback fired when a date is selected. Signature varies with mode.",
     },
     {
       prop: "timeZone",
@@ -389,7 +421,7 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
     {
       prop: "value",
       type: "number | null",
-      description: "Current progress value. null shows indeterminate state.",
+      description: "Current progress value (0–max). Pass null to show an indeterminate animated state.",
     },
     {
       prop: "max",
@@ -522,10 +554,16 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       description: "Reading direction for keyboard navigation.",
     },
     {
-      prop: "position",
+      prop: "SelectTrigger · size",
+      type: '"default" | "sm"',
+      default: '"default"',
+      description: "Visual size of the trigger button.",
+    },
+    {
+      prop: "SelectContent · position",
       type: '"item-aligned" | "popper"',
-      default: '"item-aligned"',
-      description: "Positioning strategy of SelectContent relative to the trigger.",
+      default: '"popper"',
+      description: "Positioning strategy of the dropdown relative to the trigger.",
     },
   ],
 
@@ -641,7 +679,7 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
     },
     {
       prop: "size",
-      type: '"default" | "sm"',
+      type: '"default" | "sm" | "lg"',
       default: '"default"',
       description: "Controls the visual size of the switch thumb and track.",
     },
@@ -681,13 +719,7 @@ export const API_REFERENCE: Record<string, ApiProp[]> = {
       description: "Whether tabs activate on focus or only on explicit selection.",
     },
     {
-      prop: "asChild",
-      type: "boolean",
-      default: "false",
-      description: "Merge props onto the immediate child element.",
-    },
-    {
-      prop: "variant",
+      prop: "TabsList · variant",
       type: '"default" | "line"',
       default: '"default"',
       description: "Visual style of TabsList — pill/filled or underline.",

@@ -7,6 +7,8 @@ import {
   CreditCard, Settings, Users, UserPlus, Plus, LogOut, Trash2,
   LayoutGrid, Activity, PanelLeft,
   PanelTop, PanelBottom, PanelRight,
+  Circle, Square, Triangle, Star,
+  Apple, Banana, Grape, Cherry, Citrus, Carrot, Leaf, Sprout,
 } from "lucide-react"
 
 // ─── Button icon helper ───────────────────────────────────────────────────────
@@ -18,6 +20,7 @@ function ButtonIcon({ name, className }: { name: string; className?: string }) {
 }
 
 import { Button } from "@/components/ui/button"
+import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import {
   AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
@@ -79,22 +82,29 @@ export const components: ComponentEntry[] = [
       defaultOpen:  { type: "boolean", defaultValue: true },
       bordered:     { type: "boolean", defaultValue: false },
       disabled:     { type: "boolean", defaultValue: false },
+      showIcons:    { type: "boolean", defaultValue: false },
+    },
+    cascade: (key, value, current) => {
+      if (key === "bordered" && value === true) return { defaultOpen: true }
+      return {}
     },
     render: (props) => {
-      const { type, itemCount, collapsible, defaultOpen, bordered, disabled } = props as {
+      const { type, itemCount, collapsible, defaultOpen, bordered, disabled, showIcons } = props as {
         type: "single" | "multiple"
         itemCount: string
         collapsible: boolean
         defaultOpen: boolean
         bordered: boolean
         disabled: boolean
+        showIcons: boolean
       }
       const count = Number(itemCount) || 3
+      const SAMPLE_ICONS = [Info, Settings, Activity, LayoutGrid]
       const items = [
-        { value: "item-1", trigger: "Is it accessible?",           content: "Yes. It adheres to the WAI-ARIA design pattern." },
-        { value: "item-2", trigger: "Is it styled?",               content: "Yes. It comes with default styles that match the other components' aesthetic." },
-        { value: "item-3", trigger: "Is it animated?",             content: "Yes. It's animated by default, but you can disable it if you prefer." },
-        { value: "item-4", trigger: "Can I customize it?",         content: "Yes. You can customize the styles using Tailwind CSS classes." },
+        { value: "item-1", trigger: "Is it accessible?",    content: "Yes. It adheres to the WAI-ARIA design pattern." },
+        { value: "item-2", trigger: "Is it styled?",         content: "Yes. It comes with default styles that match the other components' aesthetic." },
+        { value: "item-3", trigger: "Is it animated?",       content: "Yes. It's animated by default, but you can disable it if you prefer." },
+        { value: "item-4", trigger: "Can I customize it?",   content: "Yes. You can customize the styles using Tailwind CSS classes." },
       ].slice(0, count)
 
       const accordionProps =
@@ -102,20 +112,33 @@ export const components: ComponentEntry[] = [
           ? { type: "single" as const, defaultValue: defaultOpen ? "item-1" : undefined, collapsible }
           : { type: "multiple" as const, defaultValue: defaultOpen ? ["item-1"] : [] }
 
+      const remountKey = `${bordered}-${defaultOpen}-${type}`
+
       return (
-        <Accordion {...accordionProps} className={bordered ? "w-80 border rounded-lg px-4" : "w-80"}>
-          {items.map((item) => (
-            <AccordionItem key={item.value} value={item.value} disabled={disabled}>
-              <AccordionTrigger>{item.trigger}</AccordionTrigger>
-              <AccordionContent>{item.content}</AccordionContent>
-            </AccordionItem>
-          ))}
+        <Accordion key={remountKey} {...accordionProps} className={bordered ? "w-80 border rounded-lg px-4" : "w-80"}>
+          {items.map((item, i) => {
+            const Icon = SAMPLE_ICONS[i]
+            return (
+              <AccordionItem key={item.value} value={item.value} disabled={disabled}>
+                <AccordionTrigger>
+                  {showIcons ? (
+                    <span className="flex items-center gap-2">
+                      <Icon className="size-4 shrink-0 text-muted-foreground" />
+                      {item.trigger}
+                    </span>
+                  ) : item.trigger}
+                </AccordionTrigger>
+                <AccordionContent>{item.content}</AccordionContent>
+              </AccordionItem>
+            )
+          })}
         </Accordion>
       )
     },
     generateCode: (props) => {
       const { type, itemCount, collapsible, defaultOpen, bordered, disabled } = props as {
-        type: string; itemCount: string; collapsible: boolean; defaultOpen: boolean; bordered: boolean; disabled: boolean
+        type: string; itemCount: string; collapsible: boolean; defaultOpen: boolean
+        bordered: boolean; disabled: boolean
       }
       const count = Number(itemCount) || 3
       const items = [
@@ -125,6 +148,8 @@ export const components: ComponentEntry[] = [
         { value: "item-4", trigger: "Can I customize it?",  content: "Yes. You can customize the styles using Tailwind CSS classes." },
       ].slice(0, count)
 
+      const { showIcons } = props as { showIcons: boolean }
+      const ICON_NAMES = ["Info", "Settings", "Activity", "LayoutGrid"]
       const rootAttrs: string[] = [`type="${type}"`]
       if (type === "single") {
         if (defaultOpen) rootAttrs.push(`defaultValue="item-1"`)
@@ -134,11 +159,15 @@ export const components: ComponentEntry[] = [
       }
       rootAttrs.push(bordered ? `className="w-80 border rounded-lg px-4"` : `className="w-80"`)
 
-      const itemRows = items.map(item => {
+      const triggerContent = (text: string, iconName: string) => showIcons
+        ? `<span className="flex items-center gap-2">\n        <${iconName} className="size-4 shrink-0 text-muted-foreground" />\n        ${text}\n      </span>`
+        : text
+
+      const itemRows = items.map((item, i) => {
         const disabledAttr = disabled ? " disabled" : ""
         return [
           `  <AccordionItem value="${item.value}"${disabledAttr}>`,
-          `    <AccordionTrigger>${item.trigger}</AccordionTrigger>`,
+          `    <AccordionTrigger>${triggerContent(item.trigger, ICON_NAMES[i])}</AccordionTrigger>`,
           `    <AccordionContent>${item.content}</AccordionContent>`,
           `  </AccordionItem>`,
         ].join("\n")
@@ -147,7 +176,10 @@ export const components: ComponentEntry[] = [
       const attrStr = rootAttrs.join(" ")
       const body = `<Accordion ${attrStr}>\n${itemRows}\n</Accordion>`
       const indented = body.split("\n").map(l => `    ${l}`).join("\n")
-      return `import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
+      const lucideImport = showIcons
+        ? `import { ${ICON_NAMES.slice(0, count).join(", ")} } from "lucide-react"\n`
+        : ""
+      return `${lucideImport}import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
     },
   },
 
@@ -929,7 +961,7 @@ export default function Example() {
         return (
           <AvatarGroup>
             {initials.map((init, i) => (
-              <Avatar key={init} size={size}>
+              <Avatar key={`${init}-${withImage}`} size={size}>
                 {withImage && <AvatarImage src={imgSrcs[i]} alt={init} />}
                 <AvatarFallback>{init}</AvatarFallback>
               </Avatar>
@@ -940,7 +972,7 @@ export default function Example() {
       }
 
       return (
-        <Avatar size={size}>
+        <Avatar key={String(withImage)} size={size}>
           {withImage && <AvatarImage src={imgSrcs[0]} alt={fb} />}
           <AvatarFallback>{fb}</AvatarFallback>
           {showBadge && <AvatarBadge />}
@@ -1106,7 +1138,6 @@ export default function Example() {
         : `<Button${attrStr}>${inner}</Button>`
       const indented = tag.split("\n").map(l => `    ${l}`).join("\n")
 
-      // Collect unique icon imports
       const usedIcons = new Set<string>()
       if (loading) usedIcons.add("Loader2")
       else if (isIconSize) usedIcons.add(singleIcon)
@@ -1118,6 +1149,102 @@ export default function Example() {
         ? `import { ${[...usedIcons].join(", ")} } from "lucide-react"\n`
         : ""
       return `${iconImport}import { Button } from "@/components/ui/button"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
+    },
+  },
+
+  // ─── BUTTON GROUP ────────────────────────────────────────────────────────────
+  {
+    id: "button-group",
+    name: "Button Group",
+    description: {
+      en: "A container that groups related buttons together with consistent styling.",
+      es: "Un contenedor que agrupa botones relacionados con estilos consistentes.",
+    },
+    category: "Components",
+    filePath: "components/ui/button-group.tsx",
+    controls: {
+      orientation: { type: "select",  options: ["horizontal","vertical"], defaultValue: "horizontal" },
+      variant:     { type: "select",  options: ["default","outline","secondary","ghost"], defaultValue: "outline" },
+      size:        { type: "select",  options: ["default","xs","sm","lg"], defaultValue: "default" },
+      buttonCount: { type: "select",  options: ["2","3","4"], defaultValue: "3" },
+      button1:     { type: "text",    defaultValue: "Circle" },
+      button2:     { type: "text",    defaultValue: "Square" },
+      button3:     { type: "text",    defaultValue: "Triangle" },
+      button4:     { type: "text",    defaultValue: "Star" },
+      showIcons:   { type: "boolean", defaultValue: false },
+      separator:   { type: "boolean", defaultValue: false },
+      disabled:    { type: "boolean", defaultValue: false },
+    },
+    controlVisible: (key, props) => {
+      if (key === "separator") return props.variant === "ghost"
+      const match = key.match(/^button(\d)$/)
+      if (match) return Number(match[1]) <= Number(props.buttonCount ?? 3)
+      return true
+    },
+    render: (props) => {
+      const { orientation, variant, size, buttonCount, button1, button2, button3, button4, showIcons, separator, disabled } = props as {
+        orientation: "horizontal" | "vertical"
+        variant: string; size: string; buttonCount: string
+        button1: string; button2: string; button3: string; button4: string
+        showIcons: boolean; separator: boolean; disabled: boolean
+      }
+      const count = Number(buttonCount) || 3
+      const ICONS = [Circle, Square, Triangle, Star]
+      const labels = [button1 || "Circle", button2 || "Square", button3 || "Triangle", button4 || "Star"].slice(0, count)
+      return (
+        <ButtonGroup orientation={orientation}>
+          {labels.map((lbl, i) => {
+            const Icon = ICONS[i]
+            return (
+              <React.Fragment key={i}>
+                {separator && i > 0 && <ButtonGroupSeparator orientation={orientation === "vertical" ? "horizontal" : "vertical"} />}
+                <Button
+                  variant={variant as never}
+                  size={size as never}
+                  disabled={disabled}
+                  className={orientation === "vertical" ? "justify-start" : undefined}
+                >
+                  {showIcons && <Icon className="size-4" />}
+                  {lbl}
+                </Button>
+              </React.Fragment>
+            )
+          })}
+        </ButtonGroup>
+      )
+    },
+    generateCode: (props) => {
+      const { orientation, variant, size, buttonCount, button1, button2, button3, button4, showIcons, separator, disabled } = props as {
+        orientation: string; variant: string; size: string; buttonCount: string
+        button1: string; button2: string; button3: string; button4: string
+        showIcons: boolean; separator: boolean; disabled: boolean
+      }
+      const count = Number(buttonCount) || 3
+      const ICON_NAMES = ["Circle", "Square", "Triangle", "Star"]
+      const labels = [button1 || "Circle", button2 || "Square", button3 || "Triangle", button4 || "Star"].slice(0, count)
+      const btnAttrs: string[] = []
+      if (variant !== "default") btnAttrs.push(`variant="${variant}"`)
+      if (size    !== "default") btnAttrs.push(`size="${size}"`)
+      if (disabled) btnAttrs.push("disabled")
+      if (orientation === "vertical") btnAttrs.push(`className="justify-start"`)
+      const btnAttrStr = btnAttrs.length ? " " + btnAttrs.join(" ") : ""
+      const orientationAttr = orientation !== "horizontal" ? ` orientation="${orientation}"` : ""
+      const rows = labels.map((lbl, i) => {
+        const iconPart = showIcons ? `<${ICON_NAMES[i]} className="size-4" />` : ""
+        const inner = iconPart ? `${iconPart}${lbl}` : lbl
+        const btn = `  <Button${btnAttrStr}>${inner}</Button>`
+        const sepTag = orientation === "vertical" ? `  <ButtonGroupSeparator orientation="horizontal" />` : `  <ButtonGroupSeparator />`
+        return separator && i > 0 ? `${sepTag}\n${btn}` : btn
+      }).join("\n")
+      const body = `<ButtonGroup${orientationAttr}>\n${rows}\n</ButtonGroup>`
+      const indented = body.split("\n").map(l => `    ${l}`).join("\n")
+      const lucideImport = showIcons
+        ? `import { ${ICON_NAMES.slice(0, count).join(", ")} } from "lucide-react"\n`
+        : ""
+      const bgImport = separator
+        ? `import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group"`
+        : `import { ButtonGroup } from "@/components/ui/button-group"`
+      return `${lucideImport}import { Button } from "@/components/ui/button"\n${bgImport}\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
     },
   },
 
@@ -1143,7 +1270,7 @@ export default function Example() {
         fixedWeeks: boolean
       }
       const months = Number(numberOfMonths) || 1
-      const cls = "rounded-xl border border-zinc-200 dark:border-zinc-700"
+      const cls = "rounded-xl border border-border"
       const shared = { numberOfMonths: months, showOutsideDays, fixedWeeks, className: cls }
 
       function SingleCalendar() {
@@ -1183,7 +1310,7 @@ export default function Example() {
         months > 1 && `numberOfMonths={${months}}`,
         !showOutsideDays && `showOutsideDays={false}`,
         fixedWeeks && `fixedWeeks`,
-        `className="rounded-xl border border-zinc-200"`,
+        `className="rounded-xl border border-border"`,
       ].filter(Boolean) as string[]
       const tag = ["<Calendar", ...attrs.map(a=>`  ${a}`), "/>"].join("\n")
       const indented = tag.split("\n").map(l=>`    ${l}`).join("\n")
@@ -1292,33 +1419,40 @@ export default function Example() {
     filePath: "components/ui/input.tsx",
     controls: {
       type:        { type: "select",  options: ["text","email","password","number","search","url","tel","file"], defaultValue: "email" },
+      showLabel:   { type: "boolean", defaultValue: true },
       label:       { type: "text",    defaultValue: "Email" },
       placeholder: { type: "text",    defaultValue: "your@email.com" },
-      description: { type: "text",    defaultValue: "" },
+      showMessage: { type: "boolean", defaultValue: false },
+      description: { type: "text",    defaultValue: "We'll never share your email." },
       disabled:    { type: "boolean", defaultValue: false },
       required:    { type: "boolean", defaultValue: false },
       invalid:     { type: "boolean", defaultValue: false },
       iconLeft:    { type: "icon",    defaultValue: "none" },
       showButton:  { type: "boolean", defaultValue: false },
     },
+    controlVisible: (key, props) => {
+      if (key === "label") return !!props.showLabel
+      if (key === "description") return !!props.showMessage
+      return true
+    },
     cascade: (key, value) => {
       if (key !== "type") return {}
-      const presets: Record<string, { label: string; placeholder: string }> = {
-        text:     { label: "Name",     placeholder: "e.g. John Smith" },
-        email:    { label: "Email",    placeholder: "your@email.com" },
-        password: { label: "Password", placeholder: "••••••••" },
-        number:   { label: "Amount",   placeholder: "0" },
-        search:   { label: "",         placeholder: "Search..." },
-        url:      { label: "Website",  placeholder: "https://example.com" },
-        tel:      { label: "Phone",    placeholder: "+1 800 000 0000" },
-        file:     { label: "File",     placeholder: "" },
+      const presets: Record<string, { label: string; placeholder: string; showLabel: boolean }> = {
+        text:     { label: "Name",     placeholder: "e.g. John Smith",      showLabel: true  },
+        email:    { label: "Email",    placeholder: "your@email.com",        showLabel: true  },
+        password: { label: "Password", placeholder: "••••••••",              showLabel: true  },
+        number:   { label: "Amount",   placeholder: "0",                     showLabel: true  },
+        search:   { label: "Search",   placeholder: "Search...",             showLabel: false },
+        url:      { label: "Website",  placeholder: "https://example.com",   showLabel: true  },
+        tel:      { label: "Phone",    placeholder: "+1 800 000 0000",       showLabel: true  },
+        file:     { label: "File",     placeholder: "",                      showLabel: true  },
       }
       return presets[value as string] ?? {}
     },
     render: (props) => {
-      const { label, placeholder, type, disabled, description, required, invalid, iconLeft, showButton } = props as {
-        label: string; placeholder: string; type: string; disabled: boolean
-        description: string; required: boolean; invalid: boolean; iconLeft: string; showButton: boolean
+      const { showLabel, label, placeholder, type, disabled, showMessage, description, required, invalid, iconLeft, showButton } = props as {
+        showLabel: boolean; label: string; placeholder: string; type: string; disabled: boolean
+        showMessage: boolean; description: string; required: boolean; invalid: boolean; iconLeft: string; showButton: boolean
       }
       const hasIcon = iconLeft && iconLeft !== "none"
       const inputEl = (
@@ -1331,21 +1465,21 @@ export default function Example() {
       )
       return (
         <div className="w-72 flex flex-col gap-1.5">
-          {label && (
+          {showLabel && label && (
             <label className="text-sm font-medium text-foreground">
               {label}{required && <span className="text-destructive ml-1" aria-hidden="true">*</span>}
             </label>
           )}
           {showButton ? <div className="flex gap-2">{inputEl}<Button size="sm">Send</Button></div> : inputEl}
-          {description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
+          {showMessage && description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
           {invalid && <p className="text-xs text-destructive">This field is not valid.</p>}
         </div>
       )
     },
     generateCode: (props) => {
-      const { label, placeholder, type, disabled, description, required, invalid, iconLeft, showButton } = props as {
-        label: string; placeholder: string; type: string; disabled: boolean
-        description: string; required: boolean; invalid: boolean; iconLeft: string; showButton: boolean
+      const { showLabel, label, placeholder, type, disabled, showMessage, description, required, invalid, iconLeft, showButton } = props as {
+        showLabel: boolean; label: string; placeholder: string; type: string; disabled: boolean
+        showMessage: boolean; description: string; required: boolean; invalid: boolean; iconLeft: string; showButton: boolean
       }
       const hasIcon = iconLeft && iconLeft !== "none"
       const inputAttrs: string[] = []
@@ -1362,9 +1496,9 @@ export default function Example() {
         ? `<${iconLeft} className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />\n    ` : ""
       const wrappedInput = hasIcon
         ? `<div className="relative">\n    ${iconLine}${inputTag.split("\n").join("\n    ")}\n    </div>` : inputTag
-      const labelContent = label ? `${label}${required ? `{" "}<span className="text-destructive" aria-hidden="true">*</span>` : ""}` : ""
-      const labelLine = label ? `<label className="text-sm font-medium">\n      ${labelContent}\n    </label>\n    ` : ""
-      const descLine = description && !invalid ? `\n    <p className="text-xs text-muted-foreground">${description}</p>` : ""
+      const labelContent = showLabel && label ? `${label}${required ? `{" "}<span className="text-destructive" aria-hidden="true">*</span>` : ""}` : ""
+      const labelLine = labelContent ? `<label className="text-sm font-medium">\n      ${labelContent}\n    </label>\n    ` : ""
+      const descLine = showMessage && description && !invalid ? `\n    <p className="text-xs text-muted-foreground">${description}</p>` : ""
       const errorLine = invalid ? `\n    <p className="text-xs text-destructive">This field is not valid.</p>` : ""
       const inner = showButton
         ? `${labelLine}<div className="flex gap-2">\n      ${wrappedInput.split("\n").join("\n      ")}\n      <Button>Send</Button>\n    </div>${descLine}${errorLine}`
@@ -1377,6 +1511,152 @@ export default function Example() {
       ].filter(Boolean).join("\n")
       return `${imports}\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
     },
+    examples: [
+      {
+        title: "Default",
+        render: () => (
+          <div className="flex flex-col gap-1.5 w-60">
+            <label className="text-sm font-medium">Email</label>
+            <Input placeholder="your@email.com" />
+          </div>
+        ),
+        code: `import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return (
+    <div className="flex flex-col gap-1.5 w-60">
+      <label className="text-sm font-medium">Email</label>
+      <Input placeholder="your@email.com" />
+    </div>
+  )
+}`,
+      },
+      {
+        title: "With icon",
+        render: () => (
+          <div className="flex flex-col gap-1.5 w-60">
+            <label className="text-sm font-medium">Search</label>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+              <Input placeholder="Search..." className="pl-8" />
+            </div>
+          </div>
+        ),
+        code: `import { Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return (
+    <div className="flex flex-col gap-1.5 w-60">
+      <label className="text-sm font-medium">Search</label>
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+        <Input placeholder="Search..." className="pl-8" />
+      </div>
+    </div>
+  )
+}`,
+      },
+      {
+        title: "With description",
+        render: () => (
+          <div className="flex flex-col gap-1.5 w-60">
+            <label className="text-sm font-medium">Username</label>
+            <Input placeholder="john_doe" />
+            <p className="text-xs text-muted-foreground">This will be your public display name.</p>
+          </div>
+        ),
+        code: `import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return (
+    <div className="flex flex-col gap-1.5 w-60">
+      <label className="text-sm font-medium">Username</label>
+      <Input placeholder="john_doe" />
+      <p className="text-xs text-muted-foreground">
+        This will be your public display name.
+      </p>
+    </div>
+  )
+}`,
+      },
+      {
+        title: "Error state",
+        render: () => (
+          <div className="flex flex-col gap-1.5 w-60">
+            <label className="text-sm font-medium">Email</label>
+            <Input placeholder="your@email.com" aria-invalid="true" defaultValue="not-an-email" />
+            <p className="text-xs text-destructive">Please enter a valid email address.</p>
+          </div>
+        ),
+        code: `import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return (
+    <div className="flex flex-col gap-1.5 w-60">
+      <label className="text-sm font-medium">Email</label>
+      <Input
+        placeholder="your@email.com"
+        aria-invalid="true"
+        defaultValue="not-an-email"
+      />
+      <p className="text-xs text-destructive">
+        Please enter a valid email address.
+      </p>
+    </div>
+  )
+}`,
+      },
+      {
+        title: "Disabled",
+        render: () => (
+          <div className="flex flex-col gap-1.5 w-60">
+            <label className="text-sm font-medium text-muted-foreground">Email</label>
+            <Input placeholder="your@email.com" disabled defaultValue="user@example.com" />
+          </div>
+        ),
+        code: `import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return (
+    <div className="flex flex-col gap-1.5 w-60">
+      <label className="text-sm font-medium text-muted-foreground">Email</label>
+      <Input
+        placeholder="your@email.com"
+        disabled
+        defaultValue="user@example.com"
+      />
+    </div>
+  )
+}`,
+      },
+      {
+        title: "With button",
+        render: () => (
+          <div className="flex flex-col gap-1.5 w-60">
+            <label className="text-sm font-medium">Invite</label>
+            <div className="flex gap-2">
+              <Input placeholder="colleague@email.com" />
+              <Button size="sm">Send</Button>
+            </div>
+          </div>
+        ),
+        code: `import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return (
+    <div className="flex flex-col gap-1.5 w-60">
+      <label className="text-sm font-medium">Invite</label>
+      <div className="flex gap-2">
+        <Input placeholder="colleague@email.com" />
+        <Button size="sm">Send</Button>
+      </div>
+    </div>
+  )
+}`,
+      },
+    ],
   },
 
   // ─── PROGRESS ────────────────────────────────────────────────────────────────
@@ -1439,87 +1719,107 @@ export default function Example() {
     category: "Components",
     filePath: "components/ui/radio-group.tsx",
     controls: {
+      label:            { type: "text",    defaultValue: "Subscription plan" },
+      description:      { type: "text",    defaultValue: "" },
+      itemCount:        { type: "select",  options: ["2","3","4","5"], defaultValue: "3" },
+      option1:          { type: "text",    defaultValue: "Option 1" },
+      option2:          { type: "text",    defaultValue: "Option 2" },
+      option3:          { type: "text",    defaultValue: "Option 3" },
+      option4:          { type: "text",    defaultValue: "Option 4" },
+      option5:          { type: "text",    defaultValue: "Option 5" },
       orientation:      { type: "select",  options: ["vertical","horizontal"], defaultValue: "vertical" },
       withDescription:  { type: "boolean", defaultValue: false },
       disabled:         { type: "boolean", defaultValue: false },
       invalid:          { type: "boolean", defaultValue: false },
     },
+    controlVisible: (key, props) => {
+      const match = key.match(/^option(\d)$/)
+      if (!match) return true
+      return Number(match[1]) <= Number(props.itemCount ?? 3)
+    },
     render: (props) => {
-      const { orientation, withDescription, disabled, invalid } = props as {
+      const { label, description, itemCount, option1, option2, option3, option4, option5, orientation, withDescription, disabled, invalid } = props as {
+        label: string; description: string; itemCount: string
+        option1: string; option2: string; option3: string; option4: string; option5: string
         orientation: string; withDescription: boolean; disabled: boolean; invalid: boolean
       }
+      const count = Number(itemCount) || 3
+      const allOptions = [option1, option2, option3, option4, option5].map((o, i) => o || `Option ${i + 1}`)
+      const options = allOptions.slice(0, count).map((lbl, i) => ({ value: `option${i + 1}`, label: lbl }))
+
       if (withDescription) {
-        const plans = [
-          { value: "free",       name: "Free",       price: "$0/mo",  desc: "Perfect for individuals and small projects." },
-          { value: "pro",        name: "Pro",        price: "$12/mo", desc: "For growing teams and businesses." },
-          { value: "enterprise", name: "Enterprise", price: "$49/mo", desc: "For large organizations with advanced needs." },
-        ]
         return (
-          <RadioGroup defaultValue="pro" className="gap-3 w-72">
-            {plans.map(plan => (
-              <label key={plan.value} className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer">
-                <RadioGroupItem value={plan.value} id={plan.value} className="mt-0.5" disabled={disabled} />
-                <div className="flex flex-1 justify-between gap-2">
+          <div className="flex flex-col gap-1.5">
+            {label && <label className="text-sm font-medium text-foreground">{label}</label>}
+            <RadioGroup defaultValue="option1" className="gap-3 w-72">
+              {options.map((opt, i) => (
+                <label key={opt.value} className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer">
+                  <RadioGroupItem value={opt.value} id={opt.value} className="mt-0.5" disabled={disabled && i === 1} />
                   <div>
-                    <p className="text-sm font-medium leading-none">{plan.name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{plan.desc}</p>
+                    <p className="text-sm font-medium leading-none">{opt.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Description for {opt.label.toLowerCase()}.</p>
                   </div>
-                  <p className="text-sm font-medium shrink-0">{plan.price}</p>
-                </div>
-              </label>
-            ))}
-          </RadioGroup>
+                </label>
+              ))}
+            </RadioGroup>
+            {description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
+            {invalid && <p className="text-xs text-destructive">Please select an option.</p>}
+          </div>
         )
       }
-      const items = [
-        { value: "option1", label: "Option 1" },
-        { value: "option2", label: "Option 2" },
-        { value: "option3", label: "Option 3" },
-      ]
       return (
-        <RadioGroup defaultValue="option1"
-          className={orientation === "horizontal" ? "flex flex-row gap-6 w-fit" : "gap-3 w-fit"}>
-          {items.map((item, i) => (
-            <div key={item.value} className="flex items-center gap-2">
-              <RadioGroupItem value={item.value} id={item.value}
-                disabled={disabled && i === 1}
-                aria-invalid={invalid ? "true" : undefined} />
-              <label htmlFor={item.value} className="text-sm cursor-pointer">{item.label}</label>
-            </div>
-          ))}
-        </RadioGroup>
+        <div className="flex flex-col gap-1.5">
+          {label && <label className="text-sm font-medium text-foreground">{label}</label>}
+          <RadioGroup defaultValue="option1"
+            className={orientation === "horizontal" ? "flex flex-row gap-6 w-fit" : "gap-3 w-fit"}>
+            {options.map((opt, i) => (
+              <div key={opt.value} className="flex items-center gap-2">
+                <RadioGroupItem value={opt.value} id={opt.value}
+                  disabled={disabled && i === 1}
+                  aria-invalid={invalid ? "true" : undefined} />
+                <label htmlFor={opt.value} className="text-sm cursor-pointer">{opt.label}</label>
+              </div>
+            ))}
+          </RadioGroup>
+          {description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
+          {invalid && <p className="text-xs text-destructive">Please select an option.</p>}
+        </div>
       )
     },
     generateCode: (props) => {
-      const { orientation, withDescription, disabled, invalid } = props as {
+      const { label, description, itemCount, option1, option2, option3, option4, option5, orientation, withDescription, disabled, invalid } = props as {
+        label: string; description: string; itemCount: string
+        option1: string; option2: string; option3: string; option4: string; option5: string
         orientation: string; withDescription: boolean; disabled: boolean; invalid: boolean
       }
+      const count = Number(itemCount) || 3
+      const allOptions = [option1, option2, option3, option4, option5].map((o, i) => o || `Option ${i + 1}`)
+      const options = allOptions.slice(0, count).map((lbl, i) => ({ value: `option${i + 1}`, label: lbl }))
+      const labelLine = label ? `  <label className="text-sm font-medium">${label}</label>\n` : ""
+      const descLine = description && !invalid ? `\n  <p className="text-xs text-muted-foreground">${description}</p>` : ""
+      const errorLine = invalid ? `\n  <p className="text-xs text-destructive">Please select an option.</p>` : ""
       if (withDescription) {
-        const plans = [
-          { value: "free",       name: "Free",       price: "$0/mo",  desc: "Perfect for individuals." },
-          { value: "pro",        name: "Pro",        price: "$12/mo", desc: "For growing teams." },
-          { value: "enterprise", name: "Enterprise", price: "$49/mo", desc: "For large organizations." },
-        ]
-        const rows = plans.map(p => {
-          const dAttr = disabled ? " disabled" : ""
-          return `  <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer">\n    <RadioGroupItem value="${p.value}" id="${p.value}" className="mt-0.5"${dAttr} />\n    <div className="flex flex-1 justify-between gap-2">\n      <div>\n        <p className="text-sm font-medium leading-none">${p.name}</p>\n        <p className="text-xs text-muted-foreground mt-1">${p.desc}</p>\n      </div>\n      <p className="text-sm font-medium shrink-0">${p.price}</p>\n    </div>\n  </label>`
+        const rows = options.map((opt, i) => {
+          const dAttr = disabled && i === 1 ? " disabled" : ""
+          return `  <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer">\n    <RadioGroupItem value="${opt.value}" id="${opt.value}" className="mt-0.5"${dAttr} />\n    <div>\n      <p className="text-sm font-medium leading-none">${opt.label}</p>\n      <p className="text-xs text-muted-foreground mt-1">Description for ${opt.label.toLowerCase()}.</p>\n    </div>\n  </label>`
         }).join("\n")
-        const body = `<RadioGroup defaultValue="pro" className="gap-3 w-72">\n${rows}\n</RadioGroup>`
-        const indented = body.split("\n").map(l=>`    ${l}`).join("\n")
+        const radioGroup = `<RadioGroup defaultValue="option1" className="gap-3 w-72">\n${rows}\n</RadioGroup>`
+        const body = label || description || invalid
+          ? `<div className="flex flex-col gap-1.5">\n${labelLine}  ${radioGroup.split("\n").join("\n  ")}${descLine}${errorLine}\n</div>`
+          : radioGroup
+        const indented = body.split("\n").map(l => `    ${l}`).join("\n")
         return `import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
       }
-      const items = [
-        { value: "option1", label: "Option 1" },
-        { value: "option2", label: "Option 2" },
-        { value: "option3", label: "Option 3" },
-      ]
       const cls = orientation === "horizontal" ? `className="flex flex-row gap-6"` : `className="gap-3"`
-      const rows = items.map((item, i) => {
-        const attrs = [`value="${item.value}"`, `id="${item.value}"`, ...(disabled && i === 1 ? ["disabled"] : []), ...(invalid ? ['aria-invalid="true"'] : [])]
-        return `  <div className="flex items-center gap-2">\n    <RadioGroupItem ${attrs.join(" ")} />\n    <label htmlFor="${item.value}" className="text-sm cursor-pointer">${item.label}</label>\n  </div>`
+      const rows = options.map((opt, i) => {
+        const attrs = [`value="${opt.value}"`, `id="${opt.value}"`, ...(disabled && i === 1 ? ["disabled"] : []), ...(invalid ? ['aria-invalid="true"'] : [])]
+        return `  <div className="flex items-center gap-2">\n    <RadioGroupItem ${attrs.join(" ")} />\n    <label htmlFor="${opt.value}" className="text-sm cursor-pointer">${opt.label}</label>\n  </div>`
       }).join("\n")
-      const body = `<RadioGroup defaultValue="option1" ${cls}>\n${rows}\n</RadioGroup>`
-      const indented = body.split("\n").map(l=>`    ${l}`).join("\n")
+      const radioGroup = `<RadioGroup defaultValue="option1" ${cls}>\n${rows}\n</RadioGroup>`
+      const body = label || description || invalid
+        ? `<div className="flex flex-col gap-1.5">\n${labelLine}  ${radioGroup.split("\n").join("\n  ")}${descLine}${errorLine}\n</div>`
+        : radioGroup
+      const indented = body.split("\n").map(l => `    ${l}`).join("\n")
       return `import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
     },
   },
@@ -1535,85 +1835,175 @@ export default function Example() {
     category: "Components",
     filePath: "components/ui/select.tsx",
     controls: {
+      showLabel:   { type: "boolean", defaultValue: true },
       label:       { type: "text",    defaultValue: "Fruit" },
-      description: { type: "text",    defaultValue: "" },
       placeholder: { type: "text",    defaultValue: "Select an option" },
+      showMessage: { type: "boolean", defaultValue: false },
+      description: { type: "text",    defaultValue: "Pick your favourite fruit." },
       size:        { type: "select",  options: ["default","sm"], defaultValue: "default" },
+      showIcons:   { type: "boolean", defaultValue: false },
       disabled:    { type: "boolean", defaultValue: false },
       invalid:     { type: "boolean", defaultValue: false },
       groups:      { type: "boolean", defaultValue: false },
     },
+    controlVisible: (key, props) => {
+      if (key === "label") return !!props.showLabel
+      if (key === "description") return !!props.showMessage
+      return true
+    },
     render: (props) => {
-      const { label, description, placeholder, size, disabled, invalid, groups } = props as {
-        label: string; description: string; placeholder: string
-        size: "default" | "sm"; disabled: boolean; invalid: boolean; groups: boolean
+      const { showLabel, label, placeholder, showMessage, description, size, showIcons, disabled, invalid, groups } = props as {
+        showLabel: boolean; label: string; placeholder: string
+        showMessage: boolean; description: string
+        size: "default" | "sm"; showIcons: boolean; disabled: boolean; invalid: boolean; groups: boolean
       }
-      return (
-        <div className="flex flex-col gap-1.5 w-56">
-          {label && <label className="text-sm font-medium text-foreground">{label}</label>}
-          <Select>
+
+      const FLAT_ITEMS = [
+        { value: "apple",  label: "Apple",  Icon: Apple  },
+        { value: "orange", label: "Orange", Icon: Citrus },
+        { value: "banana", label: "Banana", Icon: Banana },
+        { value: "grape",  label: "Grape",  Icon: Grape  },
+        { value: "cherry", label: "Cherry", Icon: Cherry },
+      ]
+      const GROUP_ITEMS = [
+        { group: "Fruits",     items: [
+          { value: "apple",    label: "Apple",    Icon: Apple  },
+          { value: "orange",   label: "Orange",   Icon: Citrus },
+          { value: "banana",   label: "Banana",   Icon: Banana },
+        ]},
+        { group: "Vegetables", items: [
+          { value: "carrot",   label: "Carrot",   Icon: Carrot  },
+          { value: "broccoli", label: "Broccoli", Icon: Leaf    },
+          { value: "spinach",  label: "Spinach",  Icon: Sprout  },
+        ]},
+      ]
+      const allItems = groups
+        ? GROUP_ITEMS.flatMap(g => g.items)
+        : FLAT_ITEMS
+
+      function SelectPreview() {
+        const [value, setValue] = React.useState("")
+        return (
+          <Select value={value} onValueChange={setValue}>
             <SelectTrigger size={size} className="w-full" disabled={disabled}
               aria-invalid={invalid ? "true" : undefined}>
               <SelectValue placeholder={placeholder || "Select an option"} />
             </SelectTrigger>
             <SelectContent>
               {groups ? (
-                <>
-                  <SelectGroup>
-                    <SelectLabel>Fruits</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="orange">Orange</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                  </SelectGroup>
-                  <SelectSeparator />
-                  <SelectGroup>
-                    <SelectLabel>Vegetables</SelectLabel>
-                    <SelectItem value="carrot">Carrot</SelectItem>
-                    <SelectItem value="broccoli">Broccoli</SelectItem>
-                    <SelectItem value="spinach">Spinach</SelectItem>
-                  </SelectGroup>
-                </>
+                GROUP_ITEMS.map((g, gi) => (
+                  <React.Fragment key={g.group}>
+                    {gi > 0 && <SelectSeparator />}
+                    <SelectGroup>
+                      <SelectLabel>{g.group}</SelectLabel>
+                      {g.items.map(({ value: v, label: lbl, Icon }) => (
+                        <SelectItem key={v} value={v}>
+                          <span className="flex items-center gap-1.5">
+                            {showIcons && <Icon className="size-4 shrink-0 text-muted-foreground" />}
+                            {lbl}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </React.Fragment>
+                ))
               ) : (
-                <>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="orange">Orange</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="grape">Grape</SelectItem>
-                  <SelectItem value="mango">Mango</SelectItem>
-                </>
+                FLAT_ITEMS.map(({ value: v, label: lbl, Icon }) => (
+                  <SelectItem key={v} value={v}>
+                    <span className="flex items-center gap-1.5">
+                      {showIcons && <Icon className="size-4 shrink-0 text-muted-foreground" />}
+                      {lbl}
+                    </span>
+                  </SelectItem>
+                ))
               )}
             </SelectContent>
           </Select>
-          {description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
+        )
+      }
+
+      return (
+        <div className="flex flex-col gap-1.5 w-56">
+          {showLabel && label && <label className="text-sm font-medium text-foreground">{label}</label>}
+          <SelectPreview />
+          {showMessage && description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
           {invalid && <p className="text-xs text-destructive">Please select an option.</p>}
         </div>
       )
     },
     generateCode: (props) => {
-      const { label, description, placeholder, size, disabled, invalid, groups } = props as {
-        label: string; description: string; placeholder: string
-        size: string; disabled: boolean; invalid: boolean; groups: boolean
+      const { showLabel, label, placeholder, showMessage, description, size, showIcons, disabled, invalid, groups } = props as {
+        showLabel: boolean; label: string; placeholder: string
+        showMessage: boolean; description: string
+        size: string; showIcons: boolean; disabled: boolean; invalid: boolean; groups: boolean
       }
+      const FLAT_ITEMS = [
+        { value: "apple",  label: "Apple",  icon: "Apple"  },
+        { value: "orange", label: "Orange", icon: "Citrus" },
+        { value: "banana", label: "Banana", icon: "Banana" },
+        { value: "grape",  label: "Grape",  icon: "Grape"  },
+        { value: "cherry", label: "Cherry", icon: "Cherry" },
+      ]
+      const GROUP_ITEMS = [
+        { group: "Fruits", items: [
+          { value: "apple",    label: "Apple",    icon: "Apple"  },
+          { value: "orange",   label: "Orange",   icon: "Citrus" },
+          { value: "banana",   label: "Banana",   icon: "Banana" },
+        ]},
+        { group: "Vegetables", items: [
+          { value: "carrot",   label: "Carrot",   icon: "Carrot"  },
+          { value: "broccoli", label: "Broccoli", icon: "Leaf"    },
+          { value: "spinach",  label: "Spinach",  icon: "Sprout"  },
+        ]},
+      ]
+      const allItems = groups ? GROUP_ITEMS.flatMap(g => g.items) : FLAT_ITEMS
+      const iconNames = [...new Set(allItems.map(i => i.icon))]
+      const lucideImport = showIcons ? `import { ${iconNames.join(", ")} } from "lucide-react"\n` : ""
+
       const triggerAttrs: string[] = ['className="w-full"']
       if (size !== "default") triggerAttrs.push(`size="${size}"`)
       if (disabled) triggerAttrs.push("disabled")
       if (invalid) triggerAttrs.push('aria-invalid="true"')
       const ph = placeholder || "Select an option"
-      const items = groups
-        ? [`<SelectGroup>`, `  <SelectLabel>Fruits</SelectLabel>`, `  <SelectItem value="apple">Apple</SelectItem>`, `  <SelectItem value="orange">Orange</SelectItem>`, `  <SelectItem value="banana">Banana</SelectItem>`, `</SelectGroup>`, `<SelectSeparator />`, `<SelectGroup>`, `  <SelectLabel>Vegetables</SelectLabel>`, `  <SelectItem value="carrot">Carrot</SelectItem>`, `  <SelectItem value="broccoli">Broccoli</SelectItem>`, `  <SelectItem value="spinach">Spinach</SelectItem>`, `</SelectGroup>`].join("\n")
-        : [`<SelectItem value="apple">Apple</SelectItem>`, `<SelectItem value="orange">Orange</SelectItem>`, `<SelectItem value="banana">Banana</SelectItem>`, `<SelectItem value="grape">Grape</SelectItem>`, `<SelectItem value="mango">Mango</SelectItem>`].join("\n")
-      const labelLine = label ? `  <label className="text-sm font-medium">${label}</label>\n` : ""
-      const descLine = description && !invalid ? `\n  <p className="text-xs text-muted-foreground">${description}</p>` : ""
+
+      const itemLine = (v: string, lbl: string, icon: string) => {
+        const inner = showIcons
+          ? `<span className="flex items-center gap-1.5"><${icon} className="size-4 shrink-0 text-muted-foreground" />${lbl}</span>`
+          : lbl
+        return `<SelectItem value="${v}">${inner}</SelectItem>`
+      }
+
+      const itemsCode = groups
+        ? GROUP_ITEMS.map((g, gi) => {
+            const sep = gi > 0 ? `<SelectSeparator />\n` : ""
+            const rows = g.items.map(({ value: v, label: lbl, icon }) => `  ${itemLine(v, lbl, icon)}`).join("\n")
+            return `${sep}<SelectGroup>\n  <SelectLabel>${g.group}</SelectLabel>\n${rows}\n</SelectGroup>`
+          }).join("\n")
+        : FLAT_ITEMS.map(({ value: v, label: lbl, icon }) => itemLine(v, lbl, icon)).join("\n")
+
+      const triggerInner = showIcons
+        ? `\n    <span className="flex items-center gap-1.5 flex-1 min-w-0">\n      {selectedItem && <SelectedIcon className="size-4 shrink-0 text-muted-foreground" />}\n      <SelectValue placeholder="${ph}" />\n    </span>`
+        : `\n    <SelectValue placeholder="${ph}" />`
+
+      const stateBlock = showIcons
+        ? `  const [value, setValue] = useState("")\n  const ICONS: Record<string, React.ElementType> = { ${iconNames.map((n, i) => `${allItems.find(it => it.icon === n)?.value ?? n}: ${n}`).join(", ")} }\n  const SelectedIcon = ICONS[value]\n\n`
+        : `  const [value, setValue] = useState("")\n\n`
+
+      const selectBlock = `<Select value={value} onValueChange={setValue}>\n  <SelectTrigger ${triggerAttrs.join(" ")}>${triggerInner}\n  </SelectTrigger>\n  <SelectContent>\n${itemsCode.split("\n").map(l => `    ${l}`).join("\n")}\n  </SelectContent>\n</Select>`
+
+      const labelLine = showLabel && label ? `<label className="text-sm font-medium">${label}</label>\n  ` : ""
+      const descLine = showMessage && description && !invalid ? `\n  <p className="text-xs text-muted-foreground">${description}</p>` : ""
       const errorLine = invalid ? `\n  <p className="text-xs text-destructive">Please select an option.</p>` : ""
-      const body = `<Select>\n  <SelectTrigger ${triggerAttrs.join(" ")}>\n    <SelectValue placeholder="${ph}" />\n  </SelectTrigger>\n  <SelectContent>\n${items.split("\n").map(l => `    ${l}`).join("\n")}\n  </SelectContent>\n</Select>`
-      const wrapper = label || description || invalid
-        ? `<div className="flex flex-col gap-1.5 w-56">\n${labelLine}  ${body.split("\n").join("\n  ")}${descLine}${errorLine}\n</div>`
-        : body
-      const indented = wrapper.split("\n").map(l => `    ${l}`).join("\n")
+      const inner = labelLine || descLine || errorLine
+        ? `<div className="flex flex-col gap-1.5 w-56">\n  ${labelLine}${selectBlock.split("\n").join("\n  ")}${descLine}${errorLine}\n</div>`
+        : selectBlock
+
+      const indented = inner.split("\n").map(l => `    ${l}`).join("\n")
       const named = groups
         ? "Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue"
         : "Select, SelectContent, SelectItem, SelectTrigger, SelectValue"
-      return `import { ${named} } from "@/components/ui/select"\n\nexport default function Example() {\n  return (\n${indented}\n  )\n}`
+      const reactImport = showIcons ? `import { useState } from "react"\n` : `import { useState } from "react"\n`
+      return `${lucideImport}${reactImport}import { ${named} } from "@/components/ui/select"\n\nexport default function Example() {\n${stateBlock}  return (\n${indented}\n  )\n}`
     },
   },
 
@@ -1635,23 +2025,36 @@ export default function Example() {
       orientation: { type: "select",  options: ["horizontal","vertical"], defaultValue: "horizontal" },
       disabled:    { type: "boolean", defaultValue: false },
       showValue:   { type: "boolean", defaultValue: true },
+      valueLabel:  { type: "text",    defaultValue: "Value" },
+    },
+    controlVisible: (key, props) => {
+      if (key === "valueLabel") return !!props.showValue
+      return true
     },
     render: (props) => {
-      const { type, min, max, step, orientation, disabled, showValue } = props as {
+      const { type, min, max, step, orientation, disabled, showValue, valueLabel } = props as {
         type: string; min: number; max: number; step: string
-        orientation: string; disabled: boolean; showValue: boolean
+        orientation: string; disabled: boolean; showValue: boolean; valueLabel: string
       }
       const isRange = type === "range"
       const isVertical = orientation === "vertical"
+      const label = valueLabel || (isRange ? "Range" : "Value")
       function SliderPreview() {
         const [val, setVal] = React.useState<number[]>(isRange ? [25, 75] : [50])
         return (
           <div className={isVertical ? "flex flex-col items-center gap-4" : "flex flex-col gap-3 w-64"}>
             {showValue && (
-              <div className="flex justify-between w-full text-sm">
-                <span className="text-muted-foreground">{isRange ? "Range" : "Value"}</span>
-                <span className="font-medium text-foreground">{isRange ? `${val[0]} – ${val[1]}` : val[0]}</span>
-              </div>
+              isVertical ? (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="font-medium text-foreground">{isRange ? `${val[0]} – ${val[1]}` : val[0]}</span>
+                </div>
+              ) : (
+                <div className="flex justify-between w-full text-sm">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="font-medium text-foreground">{isRange ? `${val[0]} – ${val[1]}` : val[0]}</span>
+                </div>
+              )
             )}
             <Slider defaultValue={isRange ? [25, 75] : [50]}
               min={min} max={max} step={Number(step)}
@@ -1664,22 +2067,30 @@ export default function Example() {
       return <SliderPreview />
     },
     generateCode: (props) => {
-      const { type, min, max, step, orientation, disabled } = props as {
-        type: string; min: number; max: number; step: string; orientation: string; disabled: boolean
+      const { type, min, max, step, orientation, disabled, showValue, valueLabel } = props as {
+        type: string; min: number; max: number; step: string
+        orientation: string; disabled: boolean; showValue: boolean; valueLabel: string
       }
       const isRange = type === "range"
+      const label = valueLabel || (isRange ? "Range" : "Value")
       const attrs: string[] = [`defaultValue={${isRange ? "[25, 75]" : "[50]"}}`]
-      if (min !== 0)  attrs.push(`min={${min}}`)
+      if (min !== 0)   attrs.push(`min={${min}}`)
       if (max !== 100) attrs.push(`max={${max}}`)
       if (step !== "1") attrs.push(`step={${step}}`)
       if (orientation !== "horizontal") attrs.push(`orientation="${orientation}"`)
       if (disabled) attrs.push("disabled")
+      attrs.push("onValueChange={setVal}")
       const tag = attrs.length <= 2
         ? `<Slider ${attrs.join(" ")} />`
-        : ["<Slider", ...attrs.map(a=>`  ${a}`), "/>"].join("\n")
-      const wrapClass = orientation === "vertical" ? '"h-40"' : '"w-64"'
-      const indented = tag.split("\n").map(l=>`      ${l}`).join("\n")
-      return `import { Slider } from "@/components/ui/slider"\n\nexport default function Example() {\n  return (\n    <div className=${wrapClass}>\n${indented}\n    </div>\n  )\n}`
+        : ["<Slider", ...attrs.map(a => `  ${a}`), "/>"].join("\n")
+      const wrapClass = orientation === "vertical" ? "h-40" : "w-64"
+      const valueRow = showValue
+        ? `  <div className="flex justify-between text-sm">\n    <span className="text-muted-foreground">${label}</span>\n    <span className="font-medium">{${isRange ? "val[0] + \" – \" + val[1]" : "val[0]"}}</span>\n  </div>\n  ` : ""
+      const sliderIndented = tag.split("\n").map(l => `  ${l}`).join("\n")
+      const inner = `${valueRow}${sliderIndented}`
+      const indented = inner.split("\n").map(l => `    ${l}`).join("\n")
+      const stateBlock = `  const [val, setVal] = React.useState(${isRange ? "[25, 75]" : "[50]"})\n\n`
+      return `import { useState } from "react"\nimport { Slider } from "@/components/ui/slider"\n\nexport default function Example() {\n${stateBlock}  return (\n    <div className="${wrapClass}">\n${indented}\n    </div>\n  )\n}`
     },
   },
 
@@ -1776,22 +2187,17 @@ export default function Example() {
       const showIcon = icons !== "none"
       const showLabel = icons !== "icons only"
       return (
-        <Tabs defaultValue="tab1" orientation={orientation} className="w-80">
-          <TabsList variant={variant}>
-            {keys.map((k, i) => (
-              <TabsTrigger key={k} value={k} disabled={disabled && i === 1}>
-                {showIcon && iconEls[i]}{showLabel && labels[i]}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {keys.map((k, i) => (
-            <TabsContent key={k} value={k}>
-              <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
-                Content of {labels[i]}
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+        <div className="flex justify-center w-full">
+          <Tabs defaultValue="tab1" orientation={orientation} className="w-fit">
+            <TabsList variant={variant}>
+              {keys.map((k, i) => (
+                <TabsTrigger key={k} value={k} disabled={disabled && i === 1}>
+                  {showIcon && iconEls[i]}{showLabel && labels[i]}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
       )
     },
     compositorRender: (props) => {
@@ -1860,31 +2266,40 @@ export default function Example() {
     category: "Components",
     filePath: "components/ui/textarea.tsx",
     controls: {
-      placeholder: { type: "text",    defaultValue: "Write your message here..." },
+      showLabel:   { type: "boolean", defaultValue: true },
       label:       { type: "text",    defaultValue: "Message" },
-      description: { type: "text",    defaultValue: "" },
+      placeholder: { type: "text",    defaultValue: "Write your message here..." },
+      showMessage: { type: "boolean", defaultValue: false },
+      description: { type: "text",    defaultValue: "Max 500 characters." },
       rows:        { type: "select",  options: ["2","4","6","8"], defaultValue: "4" },
       disabled:    { type: "boolean", defaultValue: false },
       invalid:     { type: "boolean", defaultValue: false },
     },
+    controlVisible: (key, props) => {
+      if (key === "label") return !!props.showLabel
+      if (key === "description") return !!props.showMessage
+      return true
+    },
     render: (props) => {
-      const { placeholder, label, description, rows, disabled, invalid } = props as {
-        placeholder: string; label: string; description: string
+      const { showLabel, label, placeholder, showMessage, description, rows, disabled, invalid } = props as {
+        showLabel: boolean; label: string; placeholder: string
+        showMessage: boolean; description: string
         rows: string; disabled: boolean; invalid: boolean
       }
       return (
         <div className="w-72 flex flex-col gap-1.5">
-          {label && <label className="text-sm font-medium text-foreground">{label}</label>}
+          {showLabel && label && <label className="text-sm font-medium text-foreground">{label}</label>}
           <Textarea placeholder={placeholder} rows={Number(rows)} disabled={disabled}
             aria-invalid={invalid ? "true" : undefined} />
-          {description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
+          {showMessage && description && !invalid && <p className="text-xs text-muted-foreground">{description}</p>}
           {invalid && <p className="text-xs text-destructive">This field is not valid.</p>}
         </div>
       )
     },
     generateCode: (props) => {
-      const { placeholder, label, description, rows, disabled, invalid } = props as {
-        placeholder: string; label: string; description: string
+      const { showLabel, label, placeholder, showMessage, description, rows, disabled, invalid } = props as {
+        showLabel: boolean; label: string; placeholder: string
+        showMessage: boolean; description: string
         rows: string; disabled: boolean; invalid: boolean
       }
       const attrs: string[] = []
@@ -1895,8 +2310,8 @@ export default function Example() {
       const tag = attrs.length <= 1
         ? `<Textarea${attrs.length ? " " + attrs[0] : ""} />`
         : ["<Textarea", ...attrs.map(a => `  ${a}`), "/>"].join("\n")
-      const labelLine = label ? `<label className="text-sm font-medium">${label}</label>\n    ` : ""
-      const descLine = description && !invalid ? `\n    <p className="text-xs text-muted-foreground">${description}</p>` : ""
+      const labelLine = showLabel && label ? `<label className="text-sm font-medium">${label}</label>\n    ` : ""
+      const descLine = showMessage && description && !invalid ? `\n    <p className="text-xs text-muted-foreground">${description}</p>` : ""
       const errorLine = invalid ? `\n    <p className="text-xs text-destructive">This field is not valid.</p>` : ""
       const inner = `${labelLine}${tag}${descLine}${errorLine}`
       const indented = inner.split("\n").map(l => `    ${l}`).join("\n")

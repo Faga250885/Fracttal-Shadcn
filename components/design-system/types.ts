@@ -3,6 +3,7 @@ import { ReactNode } from "react"
 export type ComponentExample = {
   title: string
   render: () => ReactNode
+  code?: string
 }
 
 export type SelectControl = {
@@ -49,6 +50,7 @@ export type ComponentEntry = {
   filePath: string
   controls: Record<string, ControlDefinition>
   cascade?: (key: string, value: unknown, current: Record<string, unknown>) => Record<string, unknown>
+  controlVisible?: (key: string, props: Record<string, unknown>) => boolean
   render: (props: Record<string, unknown>) => ReactNode
   /** Optional render used inside the Compositor (replaces `render` there). */
   compositorRender?: (props: Record<string, unknown>) => ReactNode
