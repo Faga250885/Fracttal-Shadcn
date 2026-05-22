@@ -304,7 +304,7 @@ export function TokenView({
                     <CopyChip label={r.tailwind} />
                     <CopyChip label={r.cssVar} />
                     <span className="text-[10px] font-mono text-zinc-400">{r.value}</span>
-                    <span className="text-[10px] font-mono text-zinc-300">{remToPx(r.value)}</span>
+                    <span className="text-[10px] font-mono text-zinc-400">{remToPx(r.value)}</span>
                   </div>
                 </div>
               ))}
@@ -328,7 +328,7 @@ export function TokenView({
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{style.label}</span>
                       <code className="text-[10px] bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded font-mono">&lt;{style.el}&gt;</code>
                       <span className="text-[10px] font-mono text-zinc-400">{style.fontSize}</span>
-                      <span className="text-[10px] font-mono text-zinc-300">·</span>
+                      <span className="text-[10px] font-mono text-zinc-400">·</span>
                       <span className="text-[10px] font-mono text-zinc-400">{remToPx(style.fontSize)}</span>
                     </div>
                     <El className={cn(style.classes, "text-zinc-800")}>{style.sample}</El>
