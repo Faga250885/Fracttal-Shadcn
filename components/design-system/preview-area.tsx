@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Sun, Moon } from "lucide-react"
 import type { ComponentEntry } from "./types"
 import { CodeBlock } from "./code-block"
+import { ApiTable } from "./api-table"
+import { API_REFERENCE } from "./api-reference-data"
 import { translations, type Lang } from "./i18n"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -164,6 +166,19 @@ export function PreviewArea({ component, propValues, lang }: PreviewAreaProps) {
               </span>
             </div>
             <CodeBlock code={component.generateCode(propValues)} lang={lang} />
+          </div>
+        )}
+
+        {/* API Reference section */}
+        {component && API_REFERENCE[component.id] && (
+          <div className="p-4">
+            <div className="flex items-center gap-4 mb-4">
+              <h2 className="text-sm font-semibold tracking-tight">API Reference</h2>
+              <span className="text-[11px] text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
+                {API_REFERENCE[component.id].length} props
+              </span>
+            </div>
+            <ApiTable props={API_REFERENCE[component.id]} />
           </div>
         )}
 
